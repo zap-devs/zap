@@ -23,8 +23,6 @@ import Gtk from "gi://Gtk?version=4.0";
  *  - https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.ApplicationWindow.html
  */
 export class Window extends Adw.ApplicationWindow {
-    private _toastOverlay!: Adw.ToastOverlay;
-
     static {
         /**
          * Here we use a template. We define the resource path to the .ui file
@@ -42,7 +40,6 @@ export class Window extends Adw.ApplicationWindow {
         GObject.registerClass(
             {
                 Template: "resource:///sh/alisson/Zap/ui/window.ui",
-                InternalChildren: ["toastOverlay"],
             },
             Window,
         );
@@ -83,12 +80,6 @@ export class Window extends Adw.ApplicationWindow {
 
                 launcher
                     .launch(this, null)
-                    .then(() => {
-                        const toast = new Adw.Toast({
-                            title: _("Opened link"),
-                        });
-                        this._toastOverlay.add_toast(toast);
-                    })
                     .catch(console.error);
             }
         });

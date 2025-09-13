@@ -5,101 +5,66 @@ template $Gjs_Window: Adw.ApplicationWindow {
   default-width: 800;
   default-height: 600;
   width-request: 360;
-  height-request: 294;
+  height-request: 200;
 
-  content: Adw.ToastOverlay toastOverlay {
-    child: Adw.ToolbarView {
-      [top]
-      Adw.HeaderBar {
-        show-title: false;
+  Adw.Breakpoint {
+    condition ("max-width: 400sp")
 
-        [end]
-        MenuButton {
-          icon-name: "open-menu-symbolic";
-          menu-model: primary_menu;
-          primary: true;
-          tooltip-text: _("Main Menu");
-        }
-      }
-
-      Adw.StatusPage statusPage {
-        icon-name: "sh.alisson.Zap-symbolic";
-        title: _("Welcome to Zap");
-        description: _("Use this template to build your GNOME + Typescript application");
-
-        Box {
-          orientation: vertical;
-          spacing: 12;
-
-          Button dev_btn {
-            label: "Developer _Documentation";
-            use-underline: true;
-            action-name: "win.open-link";
-            action-target: "'https://developer.gnome.org/documentation/'";
-            can-shrink: true;
-            halign: center;
-
-            styles [
-              "pill",
-            ]
-          }
-
-          Button hig_btn {
-            label: "Design _Guidelines";
-            use-underline: true;
-            action-name: "win.open-link";
-            action-target: "'https://developer.gnome.org/hig/'";
-            can-shrink: true;
-            halign: center;
-
-            styles [
-              "pill",
-            ]
-          }
-
-          Button gjs_btn {
-            label: "G_JS _Guide";
-            use-underline: true;
-            action-name: "win.open-link";
-            action-target: "'https://gjs.guide/'";
-            can-shrink: true;
-            halign: center;
-
-            styles [
-              "pill",
-            ]
-          }
-        }
-      }
-    };
-  };
-}
-
-SizeGroup {
-  mode: horizontal;
-
-  widgets [
-    dev_btn,
-    hig_btn,
-    gjs_btn,
-  ]
-}
-
-menu primary_menu {
-  section {
-    item {
-      label: _("_Preferences");
-      action: "app.preferences";
-    }
-
-    item {
-      label: _("_Keyboard Shortcuts");
-      action: "win.show-help-overlay";
-    }
-
-    item {
-      label: _("_About Zap");
-      action: "app.about";
+    setters {
+      split_view.collapsed: true;
+      button.visible: true;
     }
   }
+
+  content: Adw.NavigationSplitView split_view {
+    sidebar: Adw.NavigationPage {
+      title: _("Chats");
+      tag: "sidebar";
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {
+          show-title: true;
+        }
+
+        content: Adw.StatusPage {
+          title: _("Sidebar contents here");
+
+          Button button {
+            visible: false;
+            halign: center;
+            can-shrink: true;
+            label: _("Open Content");
+            action-name: "navigation.push";
+            action-target: "'content'";
+
+            styles [
+              "pill",
+            ]
+          }
+        };
+      };
+    };
+
+    content: Adw.NavigationPage {
+      title: _("Zap");
+      tag: "content";
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {
+          show-title: false;
+        }
+
+        content: Adw.StatusPage {
+          title: _("Chat contents here");
+
+          LinkButton {
+            label: _("API Reference");
+            uri: "https://gnome.pages.gitlab.gnome.org/libadwaita/doc/1.6/class.NavigationSplitView.html";
+          }
+        };
+      };
+    };
+  };
 }

@@ -11,6 +11,9 @@
             "@girs/gtk-4.0"
         ],
         "module": "ESNext",
-        "moduleResolution": "bundler"
-    }
+        "moduleResolution": "bundler",
+        "preserveSymlinks": true,
+        "outDir": "builddir/tsc-out"
+    },
+    "include": ["src/"]
 }

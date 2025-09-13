@@ -4,4 +4,8 @@
     <file>main.js</file>
     <file>window.js</file>
   </gresource>
+  <gresource prefix="/sh/alisson/Zap/ui">
+    <file>help-overlay.ui</file>
+    <file>window.ui</file>
+  </gresource>
 </gresources>

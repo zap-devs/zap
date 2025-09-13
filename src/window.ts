@@ -41,7 +41,7 @@ export class Window extends Adw.ApplicationWindow {
          */
         GObject.registerClass(
             {
-                Template: "resource:///sh/alisson/Zap/window.ui",
+                Template: "resource:///sh/alisson/Zap/ui/window.ui",
                 InternalChildren: ["toastOverlay"],
             },
             Window,

@@ -16,10 +16,25 @@ typescript = custom_target(
   output: ['tsc-output'],
 )
 
+blueprints = custom_target('blueprints',
+  input: files(
+    'help-overlay.blp',
+    'window.blp',
+  ),
+  output: '.',
+  command: [
+    find_program('blueprint-compiler'),
+    'batch-compile',
+    '@OUTPUT@',
+    '@CURRENT_SOURCE_DIR@',
+    '@INPUT@',
+  ],
+)
+
 src_res = gnome.compile_resources(
   'sh.alisson.Zap.src',
   'sh.alisson.Zap.src.gresource.xml',
-  dependencies: typescript,
+  dependencies: [typescript, blueprints],
   source_dir: tsc_out,
   gresource_bundle: true,
   install: true,
@@ -46,5 +61,5 @@ app_launcher = configure_file(
 run_target(
   'devel',
   command: [gjs_console, '-m', app_launcher],
-  depends: [src_res, data_res, compile_local_schemas]
+  depends: [src_res, compile_local_schemas]
 )

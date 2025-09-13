@@ -1,0 +1,105 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $Gjs_Window: Adw.ApplicationWindow {
+  default-width: 800;
+  default-height: 600;
+  width-request: 360;
+  height-request: 294;
+
+  content: Adw.ToastOverlay toastOverlay {
+    child: Adw.ToolbarView {
+      [top]
+      Adw.HeaderBar {
+        show-title: false;
+
+        [end]
+        MenuButton {
+          icon-name: "open-menu-symbolic";
+          menu-model: primary_menu;
+          primary: true;
+          tooltip-text: _("Main Menu");
+        }
+      }
+
+      Adw.StatusPage statusPage {
+        icon-name: "sh.alisson.Zap-symbolic";
+        title: _("Welcome to Zap");
+        description: _("Use this template to build your GNOME + Typescript application");
+
+        Box {
+          orientation: vertical;
+          spacing: 12;
+
+          Button dev_btn {
+            label: "Developer _Documentation";
+            use-underline: true;
+            action-name: "win.open-link";
+            action-target: "'https://developer.gnome.org/documentation/'";
+            can-shrink: true;
+            halign: center;
+
+            styles [
+              "pill",
+            ]
+          }
+
+          Button hig_btn {
+            label: "Design _Guidelines";
+            use-underline: true;
+            action-name: "win.open-link";
+            action-target: "'https://developer.gnome.org/hig/'";
+            can-shrink: true;
+            halign: center;
+
+            styles [
+              "pill",
+            ]
+          }
+
+          Button gjs_btn {
+            label: "G_JS _Guide";
+            use-underline: true;
+            action-name: "win.open-link";
+            action-target: "'https://gjs.guide/'";
+            can-shrink: true;
+            halign: center;
+
+            styles [
+              "pill",
+            ]
+          }
+        }
+      }
+    };
+  };
+}
+
+SizeGroup {
+  mode: horizontal;
+
+  widgets [
+    dev_btn,
+    hig_btn,
+    gjs_btn,
+  ]
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "win.show-help-overlay";
+    }
+
+    item {
+      label: _("_About Zap");
+      action: "app.about";
+    }
+  }
+}

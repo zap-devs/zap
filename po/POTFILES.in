@@ -1,0 +1,6 @@
+data/sh.alisson.Zap.desktop.in
+data/sh.alisson.Zap.appdata.xml.in
+data/sh.alisson.Zap.gschema.xml
+data/window.ui
+src/main.ts
+src/window.ts

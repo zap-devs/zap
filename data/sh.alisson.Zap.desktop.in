@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=zap
+Exec=sh.alisson.Zap
+Icon=sh.alisson.Zap
+Terminal=false
+Type=Application
+Categories=GTK;
+StartupNotify=true

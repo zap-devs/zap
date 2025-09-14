@@ -15,9 +15,6 @@ export class ChatView extends Adw.Bin {
     private welcomeScreen!: ChatWelcome | null;
     private userName: string = "";
     private userNameLabel!: Gtk.Label;
-    private logoutAction!: Gio.SimpleAction;
-    private settingsAction!: Gio.SimpleAction;
-    private aboutAction!: Gio.SimpleAction;
     private currentChatId: number | null = null;
 
     static {
@@ -65,8 +62,7 @@ export class ChatView extends Adw.Bin {
             // Show the welcome screen by default
             this.showWelcomeScreen();
 
-            // Create menu actions
-            this.createMenuActions();
+            logger.info("ChatView constructed successfully");
         } catch (error) {
             logger.error("Error during ChatView construction:", error);
         }
@@ -422,77 +418,5 @@ export class ChatView extends Adw.Bin {
 
     public getUserName(): string {
         return this.userName;
-    }
-
-    private createMenuActions(): void {
-        // Action to logout
-        this.logoutAction = new Gio.SimpleAction({
-            name: "logout",
-        });
-
-        this.logoutAction.connect("activate", () => {
-            logger.info("Logout action triggered");
-
-            // Get the window and trigger logout
-            const window = this.get_root() as Adw.ApplicationWindow;
-            if (window) {
-                // Use the window's show-login action to go back to login
-                const app = window.get_application();
-                if (app && "setCurrentUserName" in app) {
-                    (app as any).setCurrentUserName(null);
-                }
-
-                // Use the window's action to show login
-                const showLoginAction = window.lookup_action("show-login");
-                if (showLoginAction) {
-                    showLoginAction.activate(null);
-                }
-            }
-        });
-
-        // Action to show settings
-        this.settingsAction = new Gio.SimpleAction({
-            name: "settings",
-        });
-
-        this.settingsAction.connect("activate", () => {
-            logger.info("Settings action triggered");
-            // TODO: Implement settings dialog
-            console.log("Settings clicked");
-        });
-
-        // Action to show about dialog
-        this.aboutAction = new Gio.SimpleAction({
-            name: "about",
-        });
-
-        this.aboutAction.connect("activate", () => {
-            logger.info("About action triggered");
-
-            // Show about dialog
-            const window = this.get_root() as Adw.ApplicationWindow;
-            if (window) {
-                const aboutDialog = new Adw.AboutWindow({
-                    transient_for: window,
-                    application_name: "Zap",
-                    application_icon: "sh.alisson.Zap",
-                    developer_name: "Alisson Lauffer",
-                    version: "1.0.0",
-                    developers: ["Alisson Lauffer"],
-                    copyright: "© 2025 Alisson Lauffer",
-                    license_type: Gtk.License.MIT_X11,
-                    website: "https://github.com/alissonlauffer/zap",
-                });
-                aboutDialog.present();
-            }
-        });
-
-        // Add actions to the window
-        const window = this.get_root() as Adw.ApplicationWindow;
-        if (window) {
-            window.add_action(this.logoutAction);
-            window.add_action(this.settingsAction);
-            window.add_action(this.aboutAction);
-        }
     }
 }

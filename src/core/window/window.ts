@@ -61,6 +61,9 @@ export class Window extends Adw.ApplicationWindow {
 
     private showLoginAction!: Gio.SimpleAction;
     private loginAction!: Gio.SimpleAction;
+    private logoutAction!: Gio.SimpleAction;
+    private settingsAction!: Gio.SimpleAction;
+    private aboutAction!: Gio.SimpleAction;
 
     constructor(params?: Partial<Adw.ApplicationWindow.ConstructorProps>) {
         super(params);
@@ -159,8 +162,66 @@ export class Window extends Adw.ApplicationWindow {
             this.handleLogin();
         });
 
+        // Action to logout
+        this.logoutAction = new Gio.SimpleAction({
+            name: "logout",
+        });
+
+        this.logoutAction.connect("activate", () => {
+            logger.info("Logout action triggered");
+
+            // Get the app and trigger logout
+            const app = this.get_application();
+            if (app && "setCurrentUserName" in app) {
+                (app as any).setCurrentUserName(null);
+            }
+
+            // Navigate to login screen
+            const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
+            if (stack) {
+                stack.visible_child_name = "login";
+            }
+        });
+
+        // Action to show settings
+        this.settingsAction = new Gio.SimpleAction({
+            name: "settings",
+        });
+
+        this.settingsAction.connect("activate", () => {
+            logger.info("Settings action triggered");
+            // TODO: Implement settings dialog
+            console.log("Settings clicked");
+        });
+
+        // Action to show about dialog
+        this.aboutAction = new Gio.SimpleAction({
+            name: "about",
+        });
+
+        this.aboutAction.connect("activate", () => {
+            logger.info("About action triggered");
+
+            // Show about dialog
+            const aboutDialog = new Adw.AboutWindow({
+                transient_for: this,
+                application_name: "Zap",
+                application_icon: "sh.alisson.Zap",
+                developer_name: "Alisson Lauffer",
+                version: "1.0.0",
+                developers: ["Alisson Lauffer"],
+                copyright: "© 2025 Alisson Lauffer",
+                license_type: Gtk.License.MIT_X11,
+                website: "https://github.com/alissonlauffer/zap",
+            });
+            aboutDialog.present();
+        });
+
         this.add_action(this.showLoginAction);
         this.add_action(this.loginAction);
+        this.add_action(this.logoutAction);
+        this.add_action(this.settingsAction);
+        this.add_action(this.aboutAction);
     }
 
     /**

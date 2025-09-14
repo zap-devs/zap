@@ -206,8 +206,8 @@ import Gtk from "gi://Gtk?version=4.0";
 
 // WRONG: Don't use old GTK named color syntax
 .message-bubble {
-  background-color: @accent_bg_color;  // ❌ Old syntax, deprecated
-  color: @accent_fg_color;             // ❌ Old syntax, deprecated
+  background-color: @accent_bg_color;  // Old syntax, deprecated
+  color: @accent_fg_color;             // Old syntax, deprecated
 }
 
 // NOTE: Some CSS linting errors are false-positives and should be ignored
@@ -434,7 +434,7 @@ const launcher = new Gtk.UriLauncher({ uri: "https://example.com" });
 launcher.launch(this, null).catch(console.error);
 
 // WRONG: Don't use direct system calls or unvalidated URLs
-// exec(`xdg-open ${userInput}`) // ❌ Security risk!
+// exec(`xdg-open ${userInput}`) // Security risk!
 ```
 
 ## Performance Tips
@@ -561,7 +561,7 @@ Button {
 styles [
   "flat",
   "suggested-action",
-]; // ❌ Don't put semicolon here
+]; // Don't put semicolon here
 ```
 
 ### Common Blueprint Patterns

@@ -11,14 +11,14 @@
 }
 
 .chat-message.sent {
-  background-color: @accent_bg_color;
-  color: @accent_fg_color;
+  background-color: var(--accent-bg-color);
+  color: var(--accent-fg-color);
   margin-left: 20px;
 }
 
 .chat-message.received {
-  background-color: @view_bg_color;
-  color: @view_fg_color;
+  background-color: var(--view-bg-color);
+  color: var(--view-fg-color);
   margin-right: 20px;
 }
 
@@ -31,22 +31,22 @@
 }
 
 .message-bubble.own-message {
-  background-color: @accent_bg_color;
-  color: @accent_fg_color;
+  background-color: var(--accent-bg-color);
+  color: var(--accent-fg-color);
 }
 
 .message-bubble:not(.own-message) {
-  background-color: @view_bg_color;
-  color: @view_fg_color;
+  background-color: var(--view-bg-color);
+  color: var(--view-fg-color);
 }
 
 .chat-message.sent {
-  background-color: @chat_sent_bg_color_light;
+  background-color: var(--chat-sent-bg-color-light);
 }
 
 .unread-badge {
-  background-color: @accent_bg_color;
-  color: @accent_fg_color;
+  background-color: var(--accent-bg-color);
+  color: var(--accent-fg-color);
   border-radius: 12px;
   padding: 2px 8px;
   font-size: 0.8em;

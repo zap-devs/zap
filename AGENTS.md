@@ -192,14 +192,27 @@ import type Gtk from "gi://Gtk?version=4.0";
 import Gtk from "gi://Gtk?version=4.0";
 ```
 
-### 7. CSS Linting False Positives
+### 7. CSS Variables and Color Usage
 ```typescript
-// NOTE: Most CSS linting errors are false-positives and should be ignored
-// GTK's CSS implementation is not the same as web CSS and uses:
-// - libadwaita-specific variables (@accent_bg_color, @view_bg_color)
-// - GTK-specific properties and values
-// - Different box model and layout behavior
-// Only fix CSS errors that actually break the GTK styling
+// PREFERRED: Use CSS variables instead of old GTK named colors
+// Old GTK syntax: @accent_bg_color, @view_bg_color, etc.
+// New CSS variables syntax: var(--accent-bg-color), var(--view-bg-color), etc.
+
+// CORRECT: Use CSS variables for colors
+.message-bubble {
+  background-color: var(--accent-bg-color);
+  color: var(--accent-fg-color);
+}
+
+// WRONG: Don't use old GTK named color syntax
+.message-bubble {
+  background-color: @accent_bg_color;  // ❌ Old syntax, deprecated
+  color: @accent_fg_color;             // ❌ Old syntax, deprecated
+}
+
+// NOTE: Some CSS linting errors are false-positives and should be ignored
+// since GTK's CSS implementation is not exactly the same as web CSS.
+// Only fix CSS errors that actually break the GTK styling.
 ```
 
 ## Code Style and Conventions
@@ -356,8 +369,8 @@ launcher.launch(this, null).catch(console.error);
 
 ### Styling Components
 1. Add CSS classes in Blueprint files
-2. Define styles in `src/style.css` using libadwaita variables
-3. Use semantic color variables (@accent_bg_color, @view_bg_color, etc.)
+2. Define styles in `src/style.css` using CSS variables
+3. Use semantic color variables (var(--accent-bg-color), var(--view-bg-color), etc.)
 4. Test with both light and dark themes
 
 ## Blueprint Styling Syntax

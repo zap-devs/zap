@@ -369,7 +369,7 @@ bun run tsc --strict --noEmit
 ### Application Testing
 ```bash
 # Run in development mode with hot reload
-meson devenv -C builddir ./builddir/src/sh.alisson.Zap
+meson devenv -C builddir ninja devel
 
 # Test Flatpak build locally
 flatpak run sh.alisson.Zap
@@ -380,10 +380,10 @@ flatpak run sh.alisson.Zap
 ### GTK Debugging
 ```bash
 # Enable GTK debug output
-GTK_DEBUG=all meson devenv -C builddir ./builddir/src/sh.alisson.Zap
+GTK_DEBUG=all meson devenv -C builddir ninja devel
 
 # Debug specific GTK modules
-GTK_DEBUG=actions,widgets meson devenv -C builddir ./builddir/src/sh.alisson.Zap
+GTK_DEBUG=actions,widgets meson devenv -C builddir ninja devel
 ```
 
 ### GJS Debugging
@@ -477,7 +477,7 @@ launcher.launch(this, null).catch(console.error);
 2. Mark translatable strings with `_()` in Blueprint files
 3. Update `po/POTFILES.in` to include new files
 4. Run `meson compile -C builddir` to update translation files
-5. Test with different locales using `LANGUAGE=pt_BR meson devenv -C builddir ./builddir/src/sh.alisson.Zap`
+5. Test with different locales using `LANGUAGE=pt_BR meson devenv -C builddir ninja devel`
 
 ### Adding a New Action
 1. Create GSimpleAction in appropriate class:

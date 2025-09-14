@@ -280,7 +280,24 @@ export class ChatView extends Adw.Bin {
      */
     private displayChatMessages(chatId: number): void {
         if (!this.messageContainer) {
-            return;
+            logger.error(`messageContainer is null in displayChatMessages for chat ${chatId}`);
+
+            // Try to retrieve it fresh in case of context loss
+            try {
+                const freshMessageContainer = this.get_template_child(
+                    ChatView.$gtype,
+                    "messageContainer",
+                ) as Gtk.Box;
+                if (freshMessageContainer) {
+                    this.messageContainer = freshMessageContainer;
+                } else {
+                    logger.error(`Fresh messageContainer retrieval also failed`);
+                    return;
+                }
+            } catch (retrievalError) {
+                logger.error(`Fresh messageContainer retrieval failed:`, retrievalError);
+                return;
+            }
         }
 
         // Clear the message container

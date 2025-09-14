@@ -127,7 +127,7 @@ meson devenv -C builddir ninja devel
 ```bash
 meson setup builddir --buildtype=debug
 meson compile -C builddir
-meson devenv -C builddir ./builddir/src/sh.alisson.Zap
+meson devenv -C builddir ninja devel
 ```
 
 **Production Build:**
@@ -155,7 +155,7 @@ bun run tsc --strict --noEmit
 
 **Run Application:**
 ```bash
-meson devenv -C builddir ./builddir/src/sh.alisson.Zap
+meson devenv -C builddir ninja devel
 ```
 
 **Test Flatpak Build:**
@@ -168,12 +168,12 @@ flatpak run sh.alisson.Zap
 
 **Enable GTK Debug Output:**
 ```bash
-GTK_DEBUG=all meson devenv -C builddir ./builddir/src/sh.alisson.Zap
+GTK_DEBUG=all meson devenv -C builddir ninja devel
 ```
 
 **Debug Specific GTK Modules:**
 ```bash
-GTK_DEBUG=actions,widgets meson devenv -C builddir ./builddir/src/sh.alisson.Zap
+GTK_DEBUG=actions,widgets meson devenv -C builddir ninja devel
 ```
 
 **GJS Debugging:**

@@ -114,7 +114,7 @@ export class Window extends Adw.ApplicationWindow {
 
         // Try to get the stack widget using get_template_child
         this._stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
-        logger.debug(`Window constructed, stack initialized: ${this._stack ? 'success' : 'null'}`);
+        logger.debug(`Window constructed, stack initialized: ${this._stack ? "success" : "null"}`);
 
         // Add a safety check - ensure the stack is properly initialized
         if (!this._stack) {
@@ -200,7 +200,6 @@ export class Window extends Adw.ApplicationWindow {
 
             logger.debug(`Found LoginPage instance: ${loginPage.constructor.name}`);
             this.handleLoginPage(loginPage, stack);
-
         } catch (error) {
             logger.error("Login process failed:", error);
         }
@@ -214,11 +213,13 @@ export class Window extends Adw.ApplicationWindow {
             logger.debug(`Using login page instance: ${loginPage.constructor.name}`);
 
             // Add a small delay to ensure the LoginPage is fully constructed
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise((resolve) => setTimeout(resolve, 100));
 
             // Test if this login page has template children
             const testPhoneNumber = loginPage.getPhoneNumber();
-            logger.debug(`Test phone number from login page: "${testPhoneNumber}" (template children check)`);
+            logger.debug(
+                `Test phone number from login page: "${testPhoneNumber}" (template children check)`,
+            );
 
             if (testPhoneNumber === "") {
                 logger.error("Login page does not have template children (phone entry is null)");
@@ -226,7 +227,10 @@ export class Window extends Adw.ApplicationWindow {
                 // Try to force template child retrieval
                 try {
                     logger.debug("Attempting to force template child retrieval");
-                    const phoneEntry = loginPage.get_template_child(LoginPage.$gtype, "phoneEntry") as any;
+                    const phoneEntry = loginPage.get_template_child(
+                        LoginPage.$gtype,
+                        "phoneEntry",
+                    ) as any;
                     if (phoneEntry) {
                         logger.debug("Successfully retrieved phone entry via get_template_child");
                         // Manually set the phone entry if we can get it

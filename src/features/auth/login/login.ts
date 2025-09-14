@@ -32,10 +32,14 @@ export class LoginPage extends Adw.Bin {
 
             // Try to get template children
             this.phoneEntry = this.get_template_child(LoginPage.$gtype, "phoneEntry") as Gtk.Entry;
-            logger.debug(`Phone entry retrieved: ${this.phoneEntry ? 'success' : 'null'} (instance: ${this.instanceId})`);
+            logger.debug(
+                `Phone entry retrieved: ${this.phoneEntry ? "success" : "null"} (instance: ${this.instanceId})`,
+            );
 
             this.errorLabel = this.get_template_child(LoginPage.$gtype, "errorLabel") as Gtk.Label;
-            logger.debug(`Error label retrieved: ${this.errorLabel ? 'success' : 'null'} (instance: ${this.instanceId})`);
+            logger.debug(
+                `Error label retrieved: ${this.errorLabel ? "success" : "null"} (instance: ${this.instanceId})`,
+            );
 
             // Set up validation and error handling
             this.setupValidation();
@@ -149,13 +153,19 @@ export class LoginPage extends Adw.Bin {
      * Get the phone number from the input field
      */
     public getPhoneNumber(): string {
-        logger.debug(`getPhoneNumber called (instance: ${this.instanceId}), phoneEntry: ${this.phoneEntry ? 'exists' : 'null'}`);
+        logger.debug(
+            `getPhoneNumber called (instance: ${this.instanceId}), phoneEntry: ${this.phoneEntry ? "exists" : "null"}`,
+        );
         if (this.phoneEntry) {
             const text = this.phoneEntry.get_text().trim();
-            logger.debug(`Getting phone number from entry: "${text}" (instance: ${this.instanceId})`);
+            logger.debug(
+                `Getting phone number from entry: "${text}" (instance: ${this.instanceId})`,
+            );
             return text;
         }
-        logger.debug(`Phone entry not found, returning empty string (instance: ${this.instanceId})`);
+        logger.debug(
+            `Phone entry not found, returning empty string (instance: ${this.instanceId})`,
+        );
         return "";
     }
 

@@ -3,7 +3,9 @@ import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
 import GObject from "gi://GObject?version=2.0";
 import Gtk from "gi://Gtk?version=4.0";
-import { LoginPage } from "./login.js";
+import { LoginPage } from "../../features/auth/login/login.js";
+import { userService } from "../../shared/services/user-service.js";
+import { logger } from "../logger.js";
 
 /**
  * Windows are the top-level widgets in our application.
@@ -42,7 +44,7 @@ export class Window extends Adw.ApplicationWindow {
          */
         GObject.registerClass(
             {
-                Template: "resource:///sh/alisson/Zap/ui/window.ui",
+                Template: "resource:///sh/alisson/Zap/ui/core/window/window.ui",
                 InternalChildren: ["stack"],
             },
             Window,
@@ -131,31 +133,80 @@ export class Window extends Adw.ApplicationWindow {
         });
 
         this.loginAction.connect("activate", () => {
-            // Get the login page and extract the phone number
-            const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
-            if (stack) {
-                const loginPage = stack.get_child_by_name("login");
-                if (loginPage instanceof LoginPage) {
-                    const phoneNumber = loginPage.getPhoneNumber();
-                    if (phoneNumber) {
-                        // Set the user name in the application
-                        const app = this.get_application();
-                        if (app && "setCurrentUserName" in app) {
-                            (app as any).setCurrentUserName(phoneNumber);
-                        }
-
-                        // Get the chat view and set the user name
-                        const chatPage = stack.get_child_by_name("chat");
-                        if (chatPage && "setUserName" in chatPage) {
-                            (chatPage as any).setUserName(phoneNumber);
-                        }
-                    }
-                }
-                stack.visible_child_name = "chat";
-            }
+            this.handleLogin();
         });
 
         this.add_action(this.showLoginAction);
         this.add_action(this.loginAction);
+    }
+
+    /**
+     * Handle login action with proper validation and error handling
+     */
+    private async handleLogin(): Promise<void> {
+        try {
+            logger.info("Login action triggered");
+
+            const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
+            if (!stack) {
+                logger.error("Stack widget not found");
+                return;
+            }
+
+            const loginPage = stack.get_child_by_name("login");
+            if (!(loginPage instanceof LoginPage)) {
+                logger.error("Login page not found or invalid type");
+                return;
+            }
+
+            const phoneNumber = loginPage.getPhoneNumber();
+            logger.info(`Login attempt with phone number: "${phoneNumber}"`);
+
+            // Check if phone number is empty first
+            // if (!phoneNumber || phoneNumber.trim().length === 0) {
+            //     logger.warn("Login attempt with empty phone number");
+            //     loginPage.showError("Please enter a phone number");
+            //     return;
+            // }
+
+            // Validate phone number using the login page's validation
+            const isValid = loginPage.isValid();
+            logger.debug(`Login page validation result: ${isValid}`);
+            if (!isValid) {
+                logger.warn(`Phone number validation failed in login page`);
+                // The login page already shows the error message
+                return;
+            }
+
+            // Attempt login using user service
+            const loginResult = await userService.login(phoneNumber);
+
+            if (!loginResult.success) {
+                logger.error(`Login failed: ${loginResult.error}`);
+                // TODO: Show error message to user
+                return;
+            }
+
+            logger.info(`Login successful for user: ${loginResult.data?.name || phoneNumber}`);
+
+            // Update application with user name
+            const app = this.get_application();
+            if (app && "setCurrentUserName" in app) {
+                (app as any).setCurrentUserName(loginResult.data?.name || phoneNumber);
+            }
+
+            // Update chat view with user name
+            const chatPage = stack.get_child_by_name("chat");
+            if (chatPage && "setUserName" in chatPage) {
+                (chatPage as any).setUserName(loginResult.data?.name || phoneNumber);
+            }
+
+            // Navigate to chat view
+            stack.visible_child_name = "chat";
+            logger.info("Navigation to chat view completed");
+        } catch (error) {
+            logger.error("Login process failed:", error);
+            // TODO: Show error message to user
+        }
     }
 }

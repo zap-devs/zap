@@ -12,7 +12,7 @@ enum LogLevel {
 
 class Logger {
     private static instance: Logger;
-    private logLevel: LogLevel = LogLevel.WARN; // Default to WARN level
+    private logLevel: LogLevel = LogLevel.INFO; // Default to INFO level
 
     public static getInstance(): Logger {
         if (!Logger.instance) {
@@ -54,5 +54,6 @@ class Logger {
     }
 }
 
-// Export singleton instance
+// Export singleton instance and LogLevel enum
 export const logger = Logger.getInstance();
+export { LogLevel };

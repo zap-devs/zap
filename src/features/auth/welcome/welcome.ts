@@ -5,7 +5,7 @@ export class WelcomePage extends Adw.Bin {
     static {
         GObject.registerClass(
             {
-                Template: "resource:///sh/alisson/Zap/ui/welcome.ui",
+                Template: "resource:///sh/alisson/Zap/ui/features/auth/welcome/welcome.ui",
             },
             WelcomePage,
         );

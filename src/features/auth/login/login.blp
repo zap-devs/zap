@@ -35,6 +35,18 @@ template $Gjs_LoginPage: Adw.Bin {
           width-request: 250;
         }
 
+        Label errorLabel {
+          halign: center;
+          wrap: true;
+          max-width-chars: 40;
+          visible: false;
+
+          styles [
+            "error",
+            "caption",
+          ]
+        }
+
         Button {
           halign: center;
           label: _("Login");

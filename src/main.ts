@@ -1,12 +1,14 @@
 import Adw from "gi://Adw?version=1";
 import Gdk from "gi://Gdk?version=4.0";
 import Gio from "gi://Gio?version=2.0";
+import GLib from "gi://GLib?version=2.0";
 import GObject from "gi://GObject?version=2.0";
 import Gtk from "gi://Gtk?version=4.0";
-import { ChatView } from "./chat-view.js";
-import { LoginPage } from "./login.js";
-import { WelcomePage } from "./welcome.js";
-import { Window } from "./window.js";
+import { LogLevel, logger } from "./core/logger.js";
+import { Window } from "./core/window/window.js";
+import { LoginPage } from "./features/auth/login/login.js";
+import { WelcomePage } from "./features/auth/welcome/welcome.js";
+import { ChatView } from "./features/chat/chat-view/chat-view.js";
 
 /**
  * This class is the foundation of most complex applications.
@@ -46,6 +48,9 @@ export class Application extends Adw.Application {
             application_id: "sh.alisson.Zap",
             flags: Gio.ApplicationFlags.DEFAULT_FLAGS,
         });
+
+        // Initialize logger based on environment
+        this.initializeLogger();
 
         /**
          * GActions are the most powerful tool a developer can use
@@ -93,12 +98,29 @@ export class Application extends Adw.Application {
         Gio._promisify(Gtk.UriLauncher.prototype, "launch", "launch_finish");
     }
 
+    // Initialize logger based on environment settings
+    private initializeLogger(): void {
+        // Check for debug environment variable or GJS debug flag
+        const debugMode =
+            GLib.getenv("GJS_DEBUG") === "1" ||
+            GLib.getenv("ZAP_DEBUG") === "1" ||
+            ARGV?.includes("--debug");
+
+        if (debugMode) {
+            logger.setLogLevel(LogLevel.DEBUG);
+            logger.info("Logger initialized in DEBUG mode");
+        } else {
+            logger.setLogLevel(LogLevel.INFO);
+            logger.info("Logger initialized in INFO mode");
+        }
+    }
+
     // Load CSS styles
     private loadCss(): void {
         if (this.cssLoaded) return;
 
         const cssProvider = new Gtk.CssProvider();
-        cssProvider.load_from_resource("/sh/alisson/Zap/css/style.css");
+        cssProvider.load_from_resource("/sh/alisson/Zap/css/resources/styles/global.css");
         Gtk.StyleContext.add_provider_for_display(
             Gdk.Display.get_default()!,
             cssProvider,

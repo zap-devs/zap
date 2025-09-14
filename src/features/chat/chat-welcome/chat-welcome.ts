@@ -5,7 +5,8 @@ export class ChatWelcome extends Adw.Bin {
     static {
         GObject.registerClass(
             {
-                Template: "resource:///sh/alisson/Zap/ui/chat-welcome.ui",
+                Template:
+                    "resource:///sh/alisson/Zap/ui/features/chat/chat-welcome/chat-welcome.ui",
             },
             ChatWelcome,
         );

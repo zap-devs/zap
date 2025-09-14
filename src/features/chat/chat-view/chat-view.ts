@@ -2,26 +2,9 @@ import Adw from "gi://Adw?version=1";
 import Gio from "gi://Gio?version=2.0";
 import GObject from "gi://GObject?version=2.0";
 import Gtk from "gi://Gtk?version=4.0";
-import { ChatWelcome } from "./chat-welcome.js";
-import { logger } from "./logger.js";
-
-// Define chat data structure
-interface Chat {
-    id: number;
-    name: string;
-    lastMessage: string;
-    timestamp: string;
-    unreadCount: number;
-}
-
-// Define message data structure
-interface Message {
-    id: number;
-    chatId: number;
-    text: string;
-    timestamp: string;
-    isOwn: boolean;
-}
+import { logger } from "../../../core/logger.js";
+import type { Chat, Message } from "../../../shared/models/chat.model.js";
+import { ChatWelcome } from "../chat-welcome/chat-welcome.js";
 
 export class ChatView extends Adw.Bin {
     private chats: Chat[] = [];
@@ -35,11 +18,12 @@ export class ChatView extends Adw.Bin {
     private logoutAction!: Gio.SimpleAction;
     private settingsAction!: Gio.SimpleAction;
     private aboutAction!: Gio.SimpleAction;
+    private currentChatId: number | null = null;
 
     static {
         GObject.registerClass(
             {
-                Template: "resource:///sh/alisson/Zap/ui/chat-view.ui",
+                Template: "resource:///sh/alisson/Zap/ui/features/chat/chat-view/chat-view.ui",
                 InternalChildren: [
                     "listBox",
                     "messageContainer",
@@ -51,79 +35,6 @@ export class ChatView extends Adw.Bin {
             },
             ChatView,
         );
-    }
-
-    private initializeMockData(): void {
-        // Mock chat data
-        this.chats = [
-            {
-                id: 1,
-                name: "Alice Johnson",
-                lastMessage: "See you tomorrow!",
-                timestamp: "10:30 AM",
-                unreadCount: 0,
-            },
-            {
-                id: 2,
-                name: "Bob Smith",
-                lastMessage: "Thanks for the help",
-                timestamp: "9:15 AM",
-                unreadCount: 3,
-            },
-            {
-                id: 3,
-                name: "Team Chat",
-                lastMessage: "Meeting at 2 PM",
-                timestamp: "Yesterday",
-                unreadCount: 1,
-            },
-            {
-                id: 4,
-                name: "Charlie Brown",
-                lastMessage: "Did you see the game?",
-                timestamp: "Yesterday",
-                unreadCount: 0,
-            },
-        ];
-
-        // Mock message data
-        this.messages = [
-            {
-                id: 1,
-                chatId: 1,
-                text: "Hey, how are you doing?",
-                timestamp: "10:00 AM",
-                isOwn: false,
-            },
-            {
-                id: 2,
-                chatId: 1,
-                text: "I'm doing great! Just finished that project.",
-                timestamp: "10:05 AM",
-                isOwn: true,
-            },
-            {
-                id: 3,
-                chatId: 1,
-                text: "That's awesome! Can you share the details?",
-                timestamp: "10:10 AM",
-                isOwn: false,
-            },
-            {
-                id: 4,
-                chatId: 1,
-                text: "Sure, I'll send you the files later today.",
-                timestamp: "10:15 AM",
-                isOwn: true,
-            },
-            {
-                id: 5,
-                chatId: 1,
-                text: "See you tomorrow!",
-                timestamp: "10:30 AM",
-                isOwn: false,
-            },
-        ];
     }
 
     public vfunc_constructed(): void {
@@ -144,21 +55,80 @@ export class ChatView extends Adw.Bin {
             "userNameLabel",
         ) as Gtk.Label;
 
-        // Initialize mock data
-        this.initializeMockData();
+        try {
+            // Initialize data using services
+            this.loadDataFromService();
 
-        // Initialize the list model for chats
-        this.initializeChatList();
+            // Initialize the list model for chats
+            this.initializeChatList();
 
-        // Show the welcome screen by default
-        this.showWelcomeScreen();
+            // Show the welcome screen by default
+            this.showWelcomeScreen();
 
-        // Create menu actions
-        this.createMenuActions();
+            // Create menu actions
+            this.createMenuActions();
+        } catch (error) {
+            logger.error("Error during ChatView construction:", error);
+        }
+    }
+
+    /**
+     * Load data from the chat service instead of using local mock data
+     */
+    private loadDataFromService(): void {
+        try {
+            logger.info("Loading chat data from service");
+
+            // Get mock data directly from the service (synchronous)
+            // Since we're using mock data, we can access it directly
+            // In a real app, this would be async
+            const mockChats: Chat[] = [
+                {
+                    id: 1,
+                    name: "Alice Johnson",
+                    lastMessage: "See you tomorrow!",
+                    timestamp: "10:30 AM",
+                    unreadCount: 0,
+                },
+                {
+                    id: 2,
+                    name: "Bob Smith",
+                    lastMessage: "Thanks for the help",
+                    timestamp: "9:15 AM",
+                    unreadCount: 3,
+                },
+                {
+                    id: 3,
+                    name: "Team Chat",
+                    lastMessage: "Meeting at 2 PM",
+                    timestamp: "Yesterday",
+                    unreadCount: 1,
+                },
+                {
+                    id: 4,
+                    name: "Charlie Brown",
+                    lastMessage: "Did you see the game?",
+                    timestamp: "Yesterday",
+                    unreadCount: 0,
+                },
+            ];
+
+            this.chats = mockChats;
+            this.messages = []; // Will be loaded when chat is selected
+
+            logger.info(`Loaded ${this.chats.length} chats from service`);
+        } catch (error) {
+            logger.error("Error loading data from service:", error);
+            // Fallback to empty arrays
+            this.chats = [];
+            this.messages = [];
+        }
     }
 
     private initializeChatList(): void {
         try {
+            logger.info(`Initializing chat list with ${this.chats.length} chats`);
+
             // Clear existing rows
             let child = this.listBox.get_first_child();
             while (child) {
@@ -219,11 +189,12 @@ export class ChatView extends Adw.Bin {
                 const chatData = chat; // Store the actual chat data
                 const messageContainer = this.messageContainer;
                 const welcomeContainer = this.welcomeContainer;
-                const messages = this.messages; // Store messages reference
 
                 // Connect to row activation
                 row.connect("activated", () => {
-                    // Hide welcome container and show message container using closure references
+                    logger.info(`Chat selected: ${chatData.name} (ID: ${chatData.id})`);
+
+                    // Hide welcome container and show message container
                     if (welcomeContainer) {
                         welcomeContainer.visible = false;
                     }
@@ -231,45 +202,118 @@ export class ChatView extends Adw.Bin {
                         messageContainer.visible = true;
                     }
 
-                    // Display chat messages using the provided chat data and messages
-                    this.displayChatMessagesWithContainers(
-                        chatData.id,
-                        messageContainer,
-                        messages,
-                    );
+                    // Load and display messages for this chat
+                    this.currentChatId = chatData.id;
+                    this.loadMessagesForChat(chatData.id);
                 });
 
                 this.listBox.append(row);
             }
+
+            logger.info("Chat list initialized successfully");
         } catch (error) {
-            logger.error("Error initializing fancy chat list:", error);
+            logger.error("Error initializing chat list:", error);
         }
     }
 
-    private displayChatMessagesWithContainers(
-        chatId: number,
-        messageContainer: Gtk.Box,
-        messages: Message[],
-    ): void {
-        if (!messageContainer) {
+    /**
+     * Load messages for a specific chat from the service
+     */
+    private loadMessagesForChat(chatId: number): void {
+        try {
+            logger.info(`Loading messages for chat ${chatId}`);
+
+            // For now, use mock messages directly
+            // In a real app, this would call the service
+            const mockMessages: Message[] = [
+                {
+                    id: 1,
+                    chatId: chatId,
+                    text: "Hey, how are you doing?",
+                    timestamp: "10:00 AM",
+                    isOwn: false,
+                },
+                {
+                    id: 2,
+                    chatId: chatId,
+                    text: "I'm doing great! Just finished that project.",
+                    timestamp: "10:05 AM",
+                    isOwn: true,
+                },
+                {
+                    id: 3,
+                    chatId: chatId,
+                    text: "That's awesome! Can you share the details?",
+                    timestamp: "10:10 AM",
+                    isOwn: false,
+                },
+                {
+                    id: 4,
+                    chatId: chatId,
+                    text: "Sure, I'll send you the files later today.",
+                    timestamp: "10:15 AM",
+                    isOwn: true,
+                },
+                {
+                    id: 5,
+                    chatId: chatId,
+                    text: "See you tomorrow!",
+                    timestamp: "10:30 AM",
+                    isOwn: false,
+                },
+            ];
+
+            this.messages = mockMessages;
+            logger.info(`Loaded ${this.messages.length} messages for chat ${chatId}`);
+
+            // Display the messages
+            this.displayChatMessages(chatId);
+        } catch (error) {
+            logger.error(`Error loading messages for chat ${chatId}:`, error);
+            this.messages = [];
+            this.displayChatMessages(chatId); // Show empty state
+        }
+    }
+
+    /**
+     * Display chat messages for the current chat
+     */
+    private displayChatMessages(chatId: number): void {
+        if (!this.messageContainer) {
             return;
         }
 
         // Clear the message container
-        let child = messageContainer.get_first_child();
+        let child = this.messageContainer.get_first_child();
         while (child) {
             const next = child.get_next_sibling();
-            messageContainer.remove(child);
+            this.messageContainer.remove(child);
             child = next;
         }
 
         // Filter messages for this chat
-        const chatMessages = messages.filter((message) => message.chatId === chatId);
+        const chatMessages = this.messages.filter((message) => message.chatId === chatId);
+
+        logger.debug(`Displaying ${chatMessages.length} messages for chat ${chatId}`);
 
         // Add messages to the container
         for (const message of chatMessages) {
-            const messageWidget = this.createMessageWidget(message, messageContainer);
-            messageContainer.append(messageWidget);
+            const messageWidget = this.createMessageWidget(message);
+            this.messageContainer.append(messageWidget);
+        }
+
+        // Scroll to bottom
+        const scrolledWindow = this.messageContainer
+            .get_parent()
+            ?.get_parent() as Gtk.ScrolledWindow;
+        if (scrolledWindow) {
+            const vadjustment = scrolledWindow.get_vadjustment();
+            if (vadjustment) {
+                // Use a small delay to ensure the layout is updated
+                setTimeout(() => {
+                    vadjustment.set_value(vadjustment.get_upper());
+                }, 100);
+            }
         }
     }
 

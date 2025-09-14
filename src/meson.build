@@ -1,20 +1,46 @@
 gnome = import('gnome')
 
-sources = files(
-  'logger.ts',
+# Define all TypeScript source files with their new paths
+typescript_sources = files(
+  # Core application files
   'main.ts',
-  'window.ts',
-  'welcome.ts',
-  'login.ts',
-  'chat-view.ts',
-  'chat-welcome.ts',
+  'core/window/window.ts',
+  'core/logger.ts',
+
+  # Feature files
+  'features/auth/login/login.ts',
+  'features/auth/welcome/welcome.ts',
+  'features/chat/chat-view/chat-view.ts',
+  'features/chat/chat-welcome/chat-welcome.ts',
+
+  # Shared files
+  'shared/index.ts',
+  'shared/models/chat.model.ts',
+  'shared/services/chat-service.ts',
+  'shared/services/user-service.ts',
+  'shared/utils/constants.ts',
+  'shared/utils/formatting.ts',
+  'shared/utils/validation.ts',
+
+  # Type definitions
+  'types/app.types.ts',
+)
+
+# Define all Blueprint files with their new paths
+blueprint_files = files(
+  'core/window/window.blp',
+  'features/auth/login/login.blp',
+  'features/auth/welcome/welcome.blp',
+  'features/chat/chat-view/chat-view.blp',
+  'features/chat/chat-welcome/chat-welcome.blp',
+  'resources/help-overlay.blp',
 )
 
 tsc_out = meson.project_build_root() / 'tsc-out'
 
 typescript = custom_target(
   'typescript-compile',
-  input: sources,
+  input: typescript_sources,
   build_by_default: true,
   build_always_stale: true,
   command: [ tsc, '--outDir', tsc_out ],
@@ -22,14 +48,7 @@ typescript = custom_target(
 )
 
 blueprints = custom_target('blueprints',
-  input: files(
-    'help-overlay.blp',
-    'window.blp',
-    'welcome.blp',
-    'login.blp',
-    'chat-view.blp',
-    'chat-welcome.blp',
-  ),
+  input: blueprint_files,
   output: '.',
   command: [
     find_program('blueprint-compiler'),
@@ -42,7 +61,7 @@ blueprints = custom_target('blueprints',
 
 src_res = gnome.compile_resources(
   'sh.alisson.Zap.src',
-  'sh.alisson.Zap.src.gresource.xml',
+  'resources/sh.alisson.Zap.src.gresource.xml',
   dependencies: [typescript, blueprints],
   source_dir: tsc_out,
   gresource_bundle: true,

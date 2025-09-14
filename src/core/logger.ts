@@ -43,13 +43,13 @@ class Logger {
 
     public info(message: string, ...args: unknown[]): void {
         if (this.shouldLog(LogLevel.INFO)) {
-            console.info(`[INFO] ${message}`, ...args);
+            console.log(`[INFO] ${message}`, ...args);
         }
     }
 
     public debug(message: string, ...args: unknown[]): void {
         if (this.shouldLog(LogLevel.DEBUG)) {
-            console.debug(`[DEBUG] ${message}`, ...args);
+            console.log(`[DEBUG] ${message}`, ...args);
         }
     }
 }

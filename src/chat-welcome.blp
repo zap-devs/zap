@@ -1,0 +1,27 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $Gjs_ChatWelcome : Adw.Bin {
+  child: Box {
+    orientation: vertical;
+    halign: fill;
+    valign: fill;
+    hexpand: true;
+    vexpand: true;
+
+    Adw.StatusPage {
+      title: _("Welcome to Zap");
+      description: _("Select a chat to start messaging");
+      icon-name: "sh.alisson.Zap";
+      halign: center;
+      valign: center;
+      hexpand: true;
+      vexpand: true;
+
+      Label {
+        label: _("No chat selected");
+        css-classes: [ "title-2" ];
+      }
+    }
+  };
+}

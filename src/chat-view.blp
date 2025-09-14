@@ -1,0 +1,110 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $Gjs_ChatView : Adw.Bin {
+  child: Adw.NavigationSplitView split_view {
+    min-sidebar-width: 200;
+    max-sidebar-width: 300;
+    sidebar-width-fraction: 0.3;
+
+    sidebar: Adw.NavigationPage {
+      title: _("Chats");
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {
+          show-title: true;
+          [title]
+          Adw.WindowTitle {
+            title: "Chats";
+          }
+
+          styles ["flat"]
+        }
+
+        content: Box {
+          orientation: vertical;
+
+          ScrolledWindow {
+            vexpand: true;
+            hscrollbar-policy: never;
+
+            child: ListBox listBox {
+              selection-mode: single;
+              css-classes: ["navigation-sidebar", "boxed-list"];
+
+              styles ["boxed-list"]
+            };
+          }
+        };
+      };
+    };
+
+    content: Adw.NavigationPage {
+      title: _("Chat");
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {
+          show-title: false;
+
+          Box {
+            orientation: horizontal;
+            spacing: 6;
+            halign: center;
+
+            Label userNameLabel {
+              label: _("Chat");
+              css-classes: [ "title" ];
+            }
+          }
+        }
+
+        content: Box {
+          orientation: vertical;
+
+          Box contentBox {
+            vexpand: true;
+            orientation: vertical;
+
+            ScrolledWindow scrolledWindow {
+              vexpand: true;
+              child: Box messageContainer {
+                orientation: vertical;
+                spacing: 6;
+                margin-start: 12;
+                margin-end: 12;
+                margin-top: 12;
+                margin-bottom: 12;
+              };
+            }
+
+            Box welcomeContainer {
+              vexpand: true;
+              orientation: vertical;
+            }
+          }
+
+          Box {
+            orientation: horizontal;
+            spacing: 6;
+            margin-start: 12;
+            margin-end: 12;
+            margin-top: 6;
+            margin-bottom: 6;
+
+            Entry {
+              placeholder-text: _("Type a message");
+              hexpand: true;
+            }
+
+            Button {
+              icon-name: "mail-send-symbolic";
+              action-name: "win.send-message";
+            }
+          }
+        };
+      };
+    };
+  };
+}

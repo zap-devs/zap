@@ -1,8 +1,13 @@
 gnome = import('gnome')
 
 sources = files(
+  'logger.ts',
   'main.ts',
   'window.ts',
+  'welcome.ts',
+  'login.ts',
+  'chat-view.ts',
+  'chat-welcome.ts',
 )
 
 tsc_out = meson.project_build_root() / 'tsc-out'
@@ -20,6 +25,10 @@ blueprints = custom_target('blueprints',
   input: files(
     'help-overlay.blp',
     'window.blp',
+    'welcome.blp',
+    'login.blp',
+    'chat-view.blp',
+    'chat-welcome.blp',
   ),
   output: '.',
   command: [

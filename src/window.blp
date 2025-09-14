@@ -6,65 +6,31 @@ template $Gjs_Window: Adw.ApplicationWindow {
   default-height: 600;
   width-request: 360;
   height-request: 200;
+  resizable: true;
+  title: _("Zap");
 
-  Adw.Breakpoint {
-    condition ("max-width: 400sp")
+  content: Box {
+    orientation: vertical;
 
-    setters {
-      split_view.collapsed: true;
-      button.visible: true;
+    Adw.ViewStack stack {
+      vexpand: true;
+      Adw.ViewStackPage {
+        name: "welcome";
+        title: _("Welcome");
+        child: $Gjs_WelcomePage {};
+      }
+
+      Adw.ViewStackPage {
+        name: "login";
+        title: _("Login");
+        child: $Gjs_LoginPage {};
+      }
+
+      Adw.ViewStackPage {
+        name: "chat";
+        title: _("Chat");
+        child: $Gjs_ChatView {};
+      }
     }
-  }
-
-  content: Adw.NavigationSplitView split_view {
-    sidebar: Adw.NavigationPage {
-      title: _("Chats");
-      tag: "sidebar";
-
-      child: Adw.ToolbarView {
-        [top]
-        Adw.HeaderBar {
-          show-title: true;
-        }
-
-        content: Adw.StatusPage {
-          title: _("Sidebar contents here");
-
-          Button button {
-            visible: false;
-            halign: center;
-            can-shrink: true;
-            label: _("Open Content");
-            action-name: "navigation.push";
-            action-target: "'content'";
-
-            styles [
-              "pill",
-            ]
-          }
-        };
-      };
-    };
-
-    content: Adw.NavigationPage {
-      title: _("Zap");
-      tag: "content";
-
-      child: Adw.ToolbarView {
-        [top]
-        Adw.HeaderBar {
-          show-title: false;
-        }
-
-        content: Adw.StatusPage {
-          title: _("Chat contents here");
-
-          LinkButton {
-            label: _("API Reference");
-            uri: "https://gnome.pages.gitlab.gnome.org/libadwaita/doc/1.6/class.NavigationSplitView.html";
-          }
-        };
-      };
-    };
   };
 }

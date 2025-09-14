@@ -1,0 +1,34 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $Gjs_WelcomePage : Adw.Bin {
+  child: Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      show-title: true;
+      [title]
+      Adw.WindowTitle {
+        title: "Welcome";
+      }
+
+      styles ["flat"]
+    }
+
+    content: Adw.StatusPage {
+      vexpand: true;
+      title: _("Welcome to Zap");
+      description: _("A WhatsApp client for GNOME");
+      icon-name: "sh.alisson.Zap";
+
+      Button {
+        halign: center;
+        label: _("Get Started");
+        action-name: "win.show-login";
+        styles [
+          "suggested-action",
+          "pill",
+        ]
+      }
+    };
+  };
+}

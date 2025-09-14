@@ -3,6 +3,7 @@ import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
 import GObject from "gi://GObject?version=2.0";
 import Gtk from "gi://Gtk?version=4.0";
+import { LoginPage } from "./login.js";
 
 /**
  * Windows are the top-level widgets in our application.
@@ -23,6 +24,8 @@ import Gtk from "gi://Gtk?version=4.0";
  *  - https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.ApplicationWindow.html
  */
 export class Window extends Adw.ApplicationWindow {
+    private _stack!: Adw.ViewStack;
+
     static {
         /**
          * Here we use a template. We define the resource path to the .ui file
@@ -40,6 +43,7 @@ export class Window extends Adw.ApplicationWindow {
         GObject.registerClass(
             {
                 Template: "resource:///sh/alisson/Zap/ui/window.ui",
+                InternalChildren: ["stack"],
             },
             Window,
         );
@@ -52,6 +56,9 @@ export class Window extends Adw.ApplicationWindow {
             }),
         );
     }
+
+    private showLoginAction!: Gio.SimpleAction;
+    private loginAction!: Gio.SimpleAction;
 
     constructor(params?: Partial<Adw.ApplicationWindow.ConstructorProps>) {
         super(params);
@@ -78,12 +85,77 @@ export class Window extends Adw.ApplicationWindow {
 
                 const launcher = new Gtk.UriLauncher({ uri: link });
 
-                launcher
-                    .launch(this, null)
-                    .catch(console.error);
+                launcher.launch(this, null).catch(console.error);
             }
         });
 
+        // Action to send a message
+        const sendMessage = new Gio.SimpleAction({
+            name: "send-message",
+        });
+
+        sendMessage.connect("activate", () => {
+            // Send message action handler
+        });
+
         this.add_action(openLink);
+        this.add_action(sendMessage);
+    }
+
+    /**
+     * This method is called after the widget has been fully constructed
+     * and all template children have been initialized.
+     */
+    public vfunc_constructed(): void {
+        // Call the parent class's vfunc_constructed method
+        super.vfunc_constructed();
+
+        // Try to get the stack widget using get_template_child
+        this._stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
+
+        // Action to show the login screen
+        this.showLoginAction = new Gio.SimpleAction({
+            name: "show-login",
+        });
+
+        this.showLoginAction.connect("activate", () => {
+            const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
+            if (stack) {
+                stack.visible_child_name = "login";
+            }
+        });
+
+        // Action to login
+        this.loginAction = new Gio.SimpleAction({
+            name: "login",
+        });
+
+        this.loginAction.connect("activate", () => {
+            // Get the login page and extract the phone number
+            const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
+            if (stack) {
+                const loginPage = stack.get_child_by_name("login");
+                if (loginPage instanceof LoginPage) {
+                    const phoneNumber = loginPage.getPhoneNumber();
+                    if (phoneNumber) {
+                        // Set the user name in the application
+                        const app = this.get_application();
+                        if (app && "setCurrentUserName" in app) {
+                            (app as any).setCurrentUserName(phoneNumber);
+                        }
+
+                        // Get the chat view and set the user name
+                        const chatPage = stack.get_child_by_name("chat");
+                        if (chatPage && "setUserName" in chatPage) {
+                            (chatPage as any).setUserName(phoneNumber);
+                        }
+                    }
+                }
+                stack.visible_child_name = "chat";
+            }
+        });
+
+        this.add_action(this.showLoginAction);
+        this.add_action(this.loginAction);
     }
 }

@@ -3,9 +3,21 @@
   <gresource prefix="/sh/alisson/Zap/js">
     <file>main.js</file>
     <file>window.js</file>
+    <file>welcome.js</file>
+    <file>login.js</file>
+    <file>chat-view.js</file>
+    <file>chat-welcome.js</file>
+    <file>logger.js</file>
   </gresource>
   <gresource prefix="/sh/alisson/Zap/ui">
     <file>help-overlay.ui</file>
     <file>window.ui</file>
+    <file>welcome.ui</file>
+    <file>login.ui</file>
+    <file>chat-view.ui</file>
+    <file>chat-welcome.ui</file>
+  </gresource>
+  <gresource prefix="/sh/alisson/Zap/css">
+    <file>style.css</file>
   </gresource>
 </gresources>

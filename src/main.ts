@@ -1,8 +1,11 @@
 import Adw from "gi://Adw?version=1";
+import Gdk from "gi://Gdk?version=4.0";
 import Gio from "gi://Gio?version=2.0";
 import GObject from "gi://GObject?version=2.0";
 import Gtk from "gi://Gtk?version=4.0";
-
+import { ChatView } from "./chat-view.js";
+import { LoginPage } from "./login.js";
+import { WelcomePage } from "./welcome.js";
 import { Window } from "./window.js";
 
 /**
@@ -23,6 +26,8 @@ import { Window } from "./window.js";
  */
 export class Application extends Adw.Application {
     private window?: Window;
+    private cssLoaded: boolean = false;
+    private currentUserName: string = "";
 
     /**
      * When subclassing a GObject, we need to register the class with the
@@ -88,18 +93,54 @@ export class Application extends Adw.Application {
         Gio._promisify(Gtk.UriLauncher.prototype, "launch", "launch_finish");
     }
 
+    // Load CSS styles
+    private loadCss(): void {
+        if (this.cssLoaded) return;
+
+        const cssProvider = new Gtk.CssProvider();
+        cssProvider.load_from_resource("/sh/alisson/Zap/css/style.css");
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default()!,
+            cssProvider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+        );
+
+        this.cssLoaded = true;
+    }
+
     // When overriding virtual functions, the function name must be `vfunc_$funcname`.
     public vfunc_activate(): void {
         if (!this.window) {
             this.window = new Window({ application: this });
         }
 
+        // Load CSS after window is created and display is available
+        this.loadCss();
+
         this.window.present();
+    }
+
+    public getCurrentUserName(): string {
+        return this.currentUserName;
+    }
+
+    public setCurrentUserName(userName: string): void {
+        this.currentUserName = userName;
+        // Update the window title if it's available
+        if (this.window) {
+            this.window.set_title(`${userName} - Zap`);
+        }
     }
 }
 
 export function main(argv: string[]): Promise<number> {
     const app = new Application();
+    // Explicitly reference the custom widgets to ensure their static initialization blocks run
+    // This ensures that GObject.registerClass() is called for each widget
+    void WelcomePage;
+    void LoginPage;
+    void ChatView;
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
     return app.runAsync(argv);
 }

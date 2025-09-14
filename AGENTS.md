@@ -232,22 +232,45 @@ import Gtk from "gi://Gtk?version=4.0";
 - Use CSS classes for styling, avoid inline styles
 
 ### File Organization
-- TypeScript source files in `src/`
-- Blueprint UI definitions in `.blp` files alongside `.ts` files
-- CSS in `src/style.css` with libadwaita variables
-- Resources defined in `src/sh.alisson.Zap.src.gresource.xml`
+- **Core** (`src/core/`) - Core application components (window, logger)
+- **Features** (`src/features/`) - Feature-specific modules organized by domain:
+  - `auth/` - Authentication features (login, welcome)
+  - `chat/` - Chat features (chat-view, chat-welcome)
+- **Shared** (`src/shared/`) - Shared utilities, models, and services
+- **Resources** (`src/resources/`) - Resource files (styles, gresource.xml, help-overlay)
+- **Types** (`src/types/`) - TypeScript type definitions
+- **Infrastructure** (`src/infrastructure/`) - Infrastructure components (logging)
+- Blueprint UI definitions (`.blp`) alongside TypeScript files in feature directories
+- CSS styles in `src/resources/styles/` with libadwaita variables
 
 ## Key Files and Their Purposes
 
+### Core Application
 - `src/main.ts` - Application entry point, GActions, CSS loading
-- `src/window.ts` - Main window with ViewStack navigation
-- `src/chat-view.ts` - Complex chat interface with split view
-- `src/login.ts` - Login page with phone number input
-- `src/welcome.ts` - Welcome page (minimal implementation)
-- `src/logger.ts` - Centralized logging utility
-- `src/*.blp` - Blueprint UI definitions
-- `src/style.css` - CSS using libadwaita variables
-- `src/sh.alisson.Zap.src.gresource.xml` - Resource definitions
+- `src/core/window/window.ts` - Main window with ViewStack navigation and actions
+- `src/core/logger.ts` - Centralized logging utility
+
+### Features
+- `src/features/auth/login/login.ts` - Login page with phone number validation
+- `src/features/auth/welcome/welcome.ts` - Welcome page with user onboarding
+- `src/features/chat/chat-view/chat-view.ts` - Complex chat interface with split view
+- `src/features/chat/chat-welcome/chat-welcome.ts` - Chat welcome/empty state
+
+### Shared Resources
+- `src/shared/models/chat.model.ts` - Chat data models and interfaces
+- `src/shared/services/user-service.ts` - User authentication service
+- `src/shared/services/chat-service.ts` - Chat management service
+- `src/shared/utils/validation.ts` - Phone number and input validation utilities
+- `src/shared/utils/formatting.ts` - Text and data formatting utilities
+
+### Resources and Configuration
+- `src/resources/sh.alisson.Zap.src.gresource.xml` - Resource definitions
+- `src/resources/styles/global.css` - Global CSS styles using libadwaita variables
+- `src/resources/help-overlay.blp` - Keyboard shortcuts help overlay
+- `src/**/*.blp` - Blueprint UI definitions throughout the project
+
+### Build Configuration
+- `src/meson.build` - Meson build configuration with modular source organization
 
 ## Testing
 
@@ -337,41 +360,53 @@ launcher.launch(this, null).catch(console.error);
 
 ## Common Development Workflow
 
+### Adding a New Feature
+1. Create feature directory under `src/features/` (e.g., `src/features/my-feature/`)
+2. Create Blueprint file (`my-feature.blp`) and TypeScript controller (`my-feature.ts`)
+3. Add files to appropriate sections in `src/meson.build`
+4. Add UI resource path to `src/resources/sh.alisson.Zap.src.gresource.xml`
+5. Register widget in main application startup (`src/main.ts`)
+6. Add navigation and window actions in `src/core/window/window.ts`
+
 ### Adding a New Page
-1. Create Blueprint file (`new-page.blp`)
-2. Create TypeScript controller (`new-page.ts`)
-3. Add to `src/meson.build` sources list
-4. Add to `src/sh.alisson.Zap.src.gresource.xml`
-5. Register in window's ViewStack
-6. Add navigation action
+1. Create Blueprint file in appropriate feature directory (`src/features/[feature]/new-page.blp`)
+2. Create TypeScript controller (`src/features/[feature]/new-page.ts`)
+3. Add to `src/meson.build` sources list in appropriate section
+4. Add to `src/resources/sh.alisson.Zap.src.gresource.xml`
+5. Register in window's ViewStack in `src/core/window/window.ts`
+6. Add navigation action in window class
 
 ### Adding a New Widget
-1. Create Blueprint template file (`my-widget.blp`)
+1. Create Blueprint template file in appropriate directory (`my-widget.blp`)
 2. Create TypeScript class (`my-widget.ts`) with GObject registration
 3. Add template children to `InternalChildren` array
 4. Access children in `vfunc_constructed()` using `get_template_child()`
 5. Add CSS classes and styling as needed
-6. Register widget in main application startup
+6. Register widget in main application startup (`src/main.ts`)
+7. Import widget in files where it's used
 
 ### Working with Translations
-1. Mark translatable strings with `_()` in TypeScript
+1. Mark translatable strings with `_()` in TypeScript files
 2. Mark translatable strings with `_()` in Blueprint files
 3. Update `po/POTFILES.in` to include new files
 4. Run `meson compile -C builddir` to update translation files
-5. Test with different locales using `LANGUAGE=pt_BR ./builddir/src/sh.alisson.Zap`
+5. Test with different locales using `LANGUAGE=pt_BR meson devenv -C builddir ./builddir/src/sh.alisson.Zap`
 
 ### Adding a New Action
-1. Create GSimpleAction in appropriate class (app or window level)
+1. Create GSimpleAction in appropriate class:
+   - Application-level actions in `src/main.ts` (prefixed with "app.")
+   - Window-level actions in `src/core/window/window.ts` (prefixed with "win.")
 2. Connect to "activate" signal
 3. Add to action map with `add_action()`
 4. Set keyboard shortcuts with `set_accels_for_action()`
-5. Reference in Blueprint menus if needed
+5. Reference in Blueprint menus or other UI elements if needed
 
 ### Styling Components
-1. Add CSS classes in Blueprint files
-2. Define styles in `src/style.css` using CSS variables
+1. Add CSS classes in Blueprint files using `styles` array
+2. Define styles in `src/resources/styles/global.css` using CSS variables
 3. Use semantic color variables (var(--accent-bg-color), var(--view-bg-color), etc.)
 4. Test with both light and dark themes
+5. Follow libadwaita CSS variable naming conventions
 
 ## Blueprint Styling Syntax
 

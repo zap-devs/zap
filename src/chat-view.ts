@@ -1,6 +1,5 @@
 import Adw from "gi://Adw?version=1";
 import Gio from "gi://Gio?version=2.0";
-import GLib from "gi://GLib?version=2.0";
 import GObject from "gi://GObject?version=2.0";
 import Gtk from "gi://Gtk?version=4.0";
 import { ChatWelcome } from "./chat-welcome.js";
@@ -29,9 +28,7 @@ export class ChatView extends Adw.Bin {
     private messages: Message[] = [];
     private listBox!: Gtk.ListBox;
     private messageContainer!: Gtk.Box;
-    private contentBox!: Gtk.Box;
     private welcomeContainer!: Gtk.Box;
-    private splitView!: Adw.NavigationSplitView;
     private welcomeScreen!: ChatWelcome | null;
     private userName: string = "";
     private userNameLabel!: Gtk.Label;
@@ -138,15 +135,10 @@ export class ChatView extends Adw.Bin {
             ChatView.$gtype,
             "messageContainer",
         ) as Gtk.Box;
-        this.contentBox = this.get_template_child(ChatView.$gtype, "contentBox") as Gtk.Box;
         this.welcomeContainer = this.get_template_child(
             ChatView.$gtype,
             "welcomeContainer",
         ) as Gtk.Box;
-        this.splitView = this.get_template_child(
-            ChatView.$gtype,
-            "split_view",
-        ) as Adw.NavigationSplitView;
         this.userNameLabel = this.get_template_child(
             ChatView.$gtype,
             "userNameLabel",
@@ -224,7 +216,6 @@ export class ChatView extends Adw.Bin {
                 row.add_prefix(avatar);
 
                 // Store chat index and all necessary references in the closure
-                const chatIndex = i;
                 const chatData = chat; // Store the actual chat data
                 const messageContainer = this.messageContainer;
                 const welcomeContainer = this.welcomeContainer;

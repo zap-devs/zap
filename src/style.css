@@ -3,12 +3,6 @@
  * Uses libadwaita's CSS variables for consistent styling
  */
 
-/* Window styling */
-.window {
-  background-color: @window_bg_color;
-  color: @window_fg_color;
-}
-
 /* Chat message styling */
 .chat-message {
   padding: 6px 12px;
@@ -46,32 +40,8 @@
   color: @view_fg_color;
 }
 
-/* Entry placeholder styling */
-.entry-placeholder {
-  color: @placeholder_text_color;
-}
-
-/* Dark theme support */
-@define-color chat_sent_bg_color_light #3584e4;
-@define-color chat_sent_bg_color_dark #4a90d9;
-
 .chat-message.sent {
   background-color: @chat_sent_bg_color_light;
-}
-
-/* Fancy chat list styles */
-.chat-row {
-  padding: 12px;
-  border-radius: 12px;
-  margin: 4px 8px;
-}
-
-.chat-row:hover {
-  background-color: alpha(@accent_bg_color, 0.1);
-}
-
-.chat-row:selected {
-  background-color: alpha(@accent_bg_color, 0.2);
 }
 
 .unread-badge {
@@ -83,36 +53,7 @@
   font-weight: bold;
 }
 
-.chat-avatar {
-  margin-right: 12px;
-}
-
 .chat-timestamp {
   font-size: 0.85em;
   opacity: 0.7;
-}
-
-/* Boxed list styling */
-.boxed-list {
-  background-color: @card_bg_color;
-  border-radius: 12px;
-  margin: 12px;
-}
-
-.navigation-sidebar {
-  background-color: transparent;
-}
-
-/* AdwActionRow customization */
-AdwActionRow {
-  border-radius: 8px;
-  margin: 2px 8px;
-}
-
-AdwActionRow:hover {
-  background-color: alpha(@accent_bg_color, 0.1);
-}
-
-AdwActionRow:selected {
-  background-color: alpha(@accent_bg_color, 0.2);
 }

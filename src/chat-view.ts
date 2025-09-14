@@ -1,4 +1,6 @@
 import Adw from "gi://Adw?version=1";
+import Gio from "gi://Gio?version=2.0";
+import GLib from "gi://GLib?version=2.0";
 import GObject from "gi://GObject?version=2.0";
 import Gtk from "gi://Gtk?version=4.0";
 import { ChatWelcome } from "./chat-welcome.js";
@@ -33,6 +35,9 @@ export class ChatView extends Adw.Bin {
     private welcomeScreen!: ChatWelcome | null;
     private userName: string = "";
     private userNameLabel!: Gtk.Label;
+    private logoutAction!: Gio.SimpleAction;
+    private settingsAction!: Gio.SimpleAction;
+    private aboutAction!: Gio.SimpleAction;
 
     static {
         GObject.registerClass(
@@ -155,6 +160,9 @@ export class ChatView extends Adw.Bin {
 
         // Show the welcome screen by default
         this.showWelcomeScreen();
+
+        // Create menu actions
+        this.createMenuActions();
     }
 
     private initializeChatList(): void {
@@ -362,5 +370,77 @@ export class ChatView extends Adw.Bin {
 
     public getUserName(): string {
         return this.userName;
+    }
+
+    private createMenuActions(): void {
+        // Action to logout
+        this.logoutAction = new Gio.SimpleAction({
+            name: "logout",
+        });
+
+        this.logoutAction.connect("activate", () => {
+            logger.info("Logout action triggered");
+
+            // Get the window and trigger logout
+            const window = this.get_root() as Adw.ApplicationWindow;
+            if (window) {
+                // Use the window's show-login action to go back to login
+                const app = window.get_application();
+                if (app && "setCurrentUserName" in app) {
+                    (app as any).setCurrentUserName(null);
+                }
+
+                // Use the window's action to show login
+                const showLoginAction = window.lookup_action("show-login");
+                if (showLoginAction) {
+                    showLoginAction.activate(null);
+                }
+            }
+        });
+
+        // Action to show settings
+        this.settingsAction = new Gio.SimpleAction({
+            name: "settings",
+        });
+
+        this.settingsAction.connect("activate", () => {
+            logger.info("Settings action triggered");
+            // TODO: Implement settings dialog
+            console.log("Settings clicked");
+        });
+
+        // Action to show about dialog
+        this.aboutAction = new Gio.SimpleAction({
+            name: "about",
+        });
+
+        this.aboutAction.connect("activate", () => {
+            logger.info("About action triggered");
+
+            // Show about dialog
+            const window = this.get_root() as Adw.ApplicationWindow;
+            if (window) {
+                const aboutDialog = new Adw.AboutWindow({
+                    transient_for: window,
+                    application_name: "Zap",
+                    application_icon: "sh.alisson.Zap",
+                    developer_name: "Alisson",
+                    version: "1.0.0",
+                    developers: ["Alisson"],
+                    copyright: "© 2024 Alisson",
+                    license_type: Gtk.License.GPL_3_0,
+                    website: "https://github.com/alisson/zap",
+                });
+                aboutDialog.present();
+            }
+        });
+
+        // Add actions to the window
+        const window = this.get_root() as Adw.ApplicationWindow;
+        if (window) {
+            window.add_action(this.logoutAction);
+            window.add_action(this.settingsAction);
+            window.add_action(this.aboutAction);
+        }
     }
 }

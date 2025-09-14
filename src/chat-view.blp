@@ -1,7 +1,7 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $Gjs_ChatView : Adw.Bin {
+template $Gjs_ChatView: Adw.Bin {
   child: Adw.NavigationSplitView split_view {
     min-sidebar-width: 200;
     max-sidebar-width: 300;
@@ -14,12 +14,22 @@ template $Gjs_ChatView : Adw.Bin {
         [top]
         Adw.HeaderBar {
           show-title: true;
+
           [title]
           Adw.WindowTitle {
             title: "Chats";
           }
 
-          styles ["flat"]
+          [end]
+          MenuButton {
+            icon-name: "open-menu-symbolic";
+            tooltip-text: _("Main Menu");
+            menu-model: primary_menu;
+          }
+
+          styles [
+            "flat",
+          ]
         }
 
         content: Box {
@@ -31,9 +41,10 @@ template $Gjs_ChatView : Adw.Bin {
 
             child: ListBox listBox {
               selection-mode: single;
-              css-classes: ["navigation-sidebar", "boxed-list"];
 
-              styles ["boxed-list"]
+              styles [
+                "boxed-list",
+              ]
             };
           }
         };
@@ -55,7 +66,10 @@ template $Gjs_ChatView : Adw.Bin {
 
             Label userNameLabel {
               label: _("Chat");
-              css-classes: [ "title" ];
+
+              styles [
+                "title",
+              ]
             }
           }
         }
@@ -69,6 +83,7 @@ template $Gjs_ChatView : Adw.Bin {
 
             ScrolledWindow scrolledWindow {
               vexpand: true;
+
               child: Box messageContainer {
                 orientation: vertical;
                 spacing: 6;
@@ -107,4 +122,25 @@ template $Gjs_ChatView : Adw.Bin {
       };
     };
   };
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_Settings");
+      action: "win.settings";
+    }
+
+    item {
+      label: _("_About");
+      action: "win.about";
+    }
+  }
+
+  section {
+    item {
+      label: _("_Log Out");
+      action: "win.logout";
+    }
+  }
 }

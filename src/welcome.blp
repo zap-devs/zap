@@ -1,17 +1,20 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $Gjs_WelcomePage : Adw.Bin {
+template $Gjs_WelcomePage: Adw.Bin {
   child: Adw.ToolbarView {
     [top]
     Adw.HeaderBar {
       show-title: true;
+
       [title]
       Adw.WindowTitle {
         title: "Welcome";
       }
 
-      styles ["flat"]
+      styles [
+        "flat",
+      ]
     }
 
     content: Adw.StatusPage {
@@ -24,6 +27,7 @@ template $Gjs_WelcomePage : Adw.Bin {
         halign: center;
         label: _("Get Started");
         action-name: "win.show-login";
+
         styles [
           "suggested-action",
           "pill",

@@ -14,21 +14,25 @@ template $Gjs_Window: Adw.ApplicationWindow {
 
     Adw.ViewStack stack {
       vexpand: true;
+
       Adw.ViewStackPage {
         name: "welcome";
         title: _("Welcome");
+
         child: $Gjs_WelcomePage {};
       }
 
       Adw.ViewStackPage {
         name: "login";
         title: _("Login");
+
         child: $Gjs_LoginPage {};
       }
 
       Adw.ViewStackPage {
         name: "chat";
         title: _("Chat");
+
         child: $Gjs_ChatView {};
       }
     }

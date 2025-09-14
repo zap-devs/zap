@@ -81,41 +81,13 @@ template $Gjs_ChatView: Adw.Bin {
             vexpand: true;
             orientation: vertical;
 
-            ScrolledWindow scrolledWindow {
-              vexpand: true;
-
-              child: Box messageContainer {
-                orientation: vertical;
-                spacing: 6;
-                margin-start: 12;
-                margin-end: 12;
-                margin-top: 12;
-                margin-bottom: 12;
-              };
-            }
-
             Box welcomeContainer {
               vexpand: true;
               orientation: vertical;
             }
-          }
 
-          Box {
-            orientation: horizontal;
-            spacing: 6;
-            margin-start: 12;
-            margin-end: 12;
-            margin-top: 6;
-            margin-bottom: 6;
-
-            Entry {
-              placeholder-text: _("Type a message");
-              hexpand: true;
-            }
-
-            Button {
-              icon-name: "mail-send-symbolic";
-              action-name: "win.send-message";
+            $Gjs_ChatContent chatContent {
+              vexpand: true;
             }
           }
         };

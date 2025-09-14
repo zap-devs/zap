@@ -4,13 +4,13 @@ import GObject from "gi://GObject?version=2.0";
 import Gtk from "gi://Gtk?version=4.0";
 import { logger } from "../../../core/logger.js";
 import type { Chat, Message } from "../../../shared/models/chat.model.js";
+import type { ChatContent } from "../chat-content/chat-content.js";
 import { ChatWelcome } from "../chat-welcome/chat-welcome.js";
 
 export class ChatView extends Adw.Bin {
     private chats: Chat[] = [];
     private messages: Message[] = [];
     private listBox!: Gtk.ListBox;
-    private messageContainer!: Gtk.Box;
     private welcomeContainer!: Gtk.Box;
     private welcomeScreen!: ChatWelcome | null;
     private userName: string = "";
@@ -23,11 +23,11 @@ export class ChatView extends Adw.Bin {
                 Template: "resource:///sh/alisson/Zap/ui/features/chat/chat-view/chat-view.ui",
                 InternalChildren: [
                     "listBox",
-                    "messageContainer",
                     "contentBox",
                     "welcomeContainer",
                     "split_view",
                     "userNameLabel",
+                    "chatContent",
                 ],
             },
             ChatView,
@@ -39,10 +39,6 @@ export class ChatView extends Adw.Bin {
 
         // Get the widgets from the template
         this.listBox = this.get_template_child(ChatView.$gtype, "listBox") as Gtk.ListBox;
-        this.messageContainer = this.get_template_child(
-            ChatView.$gtype,
-            "messageContainer",
-        ) as Gtk.Box;
         this.welcomeContainer = this.get_template_child(
             ChatView.$gtype,
             "welcomeContainer",
@@ -51,6 +47,8 @@ export class ChatView extends Adw.Bin {
             ChatView.$gtype,
             "userNameLabel",
         ) as Gtk.Label;
+
+        logger.info("ChatView vfunc_constructed called");
 
         try {
             // Initialize data using services
@@ -183,19 +181,15 @@ export class ChatView extends Adw.Bin {
 
                 // Store chat index and all necessary references in the closure
                 const chatData = chat; // Store the actual chat data
-                const messageContainer = this.messageContainer;
                 const welcomeContainer = this.welcomeContainer;
 
                 // Connect to row activation
                 row.connect("activated", () => {
                     logger.info(`Chat selected: ${chatData.name} (ID: ${chatData.id})`);
 
-                    // Hide welcome container and show message container
+                    // Hide welcome container and show chat content
                     if (welcomeContainer) {
                         welcomeContainer.visible = false;
-                    }
-                    if (messageContainer) {
-                        messageContainer.visible = true;
                     }
 
                     // Load and display messages for this chat
@@ -262,135 +256,43 @@ export class ChatView extends Adw.Bin {
             this.messages = mockMessages;
             logger.info(`Loaded ${this.messages.length} messages for chat ${chatId}`);
 
-            // Display the messages
-            this.displayChatMessages(chatId);
+            // CRITICAL FIX: Retrieve ChatContent fresh in action callback to avoid context loss
+            const chatContent = this.get_template_child(
+                ChatView.$gtype,
+                "chatContent",
+            ) as ChatContent;
+            logger.debug(`Retrieved ChatContent fresh: ${!!chatContent}`);
+
+            if (chatContent) {
+                logger.debug(`Calling loadMessages with ${this.messages.length} messages`);
+                chatContent.visible = true;
+                chatContent.loadMessages(chatId, this.messages);
+                logger.debug(`loadMessages call completed`);
+            } else {
+                logger.error(`ChatContent is null, cannot load messages`);
+            }
         } catch (error) {
             logger.error(`Error loading messages for chat ${chatId}:`, error);
             this.messages = [];
-            this.displayChatMessages(chatId); // Show empty state
-        }
-    }
 
-    /**
-     * Display chat messages for the current chat
-     */
-    private displayChatMessages(chatId: number): void {
-        if (!this.messageContainer) {
-            logger.error(`messageContainer is null in displayChatMessages for chat ${chatId}`);
-
-            // Try to retrieve it fresh in case of context loss
-            try {
-                const freshMessageContainer = this.get_template_child(
-                    ChatView.$gtype,
-                    "messageContainer",
-                ) as Gtk.Box;
-                if (freshMessageContainer) {
-                    this.messageContainer = freshMessageContainer;
-                } else {
-                    logger.error(`Fresh messageContainer retrieval also failed`);
-                    return;
-                }
-            } catch (retrievalError) {
-                logger.error(`Fresh messageContainer retrieval failed:`, retrievalError);
-                return;
+            // Try to retrieve ChatContent fresh for clearing messages
+            const chatContent = this.get_template_child(
+                ChatView.$gtype,
+                "chatContent",
+            ) as ChatContent;
+            if (chatContent) {
+                chatContent.clearMessages();
             }
         }
-
-        // Clear the message container
-        let child = this.messageContainer.get_first_child();
-        while (child) {
-            const next = child.get_next_sibling();
-            this.messageContainer.remove(child);
-            child = next;
-        }
-
-        // Filter messages for this chat
-        const chatMessages = this.messages.filter((message) => message.chatId === chatId);
-
-        logger.debug(`Displaying ${chatMessages.length} messages for chat ${chatId}`);
-
-        // Add messages to the container
-        for (const message of chatMessages) {
-            const messageWidget = this.createMessageWidget(message);
-            this.messageContainer.append(messageWidget);
-        }
-
-        // Scroll to bottom
-        const scrolledWindow = this.messageContainer
-            .get_parent()
-            ?.get_parent() as Gtk.ScrolledWindow;
-        if (scrolledWindow) {
-            const vadjustment = scrolledWindow.get_vadjustment();
-            if (vadjustment) {
-                // Use a small delay to ensure the layout is updated
-                setTimeout(() => {
-                    vadjustment.set_value(vadjustment.get_upper());
-                }, 100);
-            }
-        }
-    }
-
-    private createMessageWidget(message: Message, messageContainer?: Gtk.Box): Gtk.Widget {
-        // Use the provided messageContainer or fall back to this.messageContainer
-        const container = messageContainer || this.messageContainer;
-
-        if (!container) {
-            return new Gtk.Box();
-        }
-
-        // Create a box for the message
-        const messageBox = new Gtk.Box({
-            orientation: Gtk.Orientation.HORIZONTAL,
-            spacing: 6,
-            margin_start: 6,
-            margin_end: 6,
-            margin_top: 3,
-            margin_bottom: 3,
-        });
-
-        // Align based on whether it's own message or not
-        if (message.isOwn) {
-            messageBox.halign = Gtk.Align.END;
-        } else {
-            messageBox.halign = Gtk.Align.START;
-        }
-
-        // Create the message bubble
-        const bubble = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            spacing: 4,
-            css_classes: message.isOwn ? ["message-bubble", "own-message"] : ["message-bubble"],
-        });
-
-        // Create the message text
-        const messageLabel = new Gtk.Label({
-            label: message.text,
-            wrap: true,
-            halign: Gtk.Align.START,
-        });
-
-        // Create the timestamp
-        const timeLabel = new Gtk.Label({
-            label: message.timestamp,
-            css_classes: ["caption", "dim-label"],
-            halign: Gtk.Align.END,
-        });
-
-        // Assemble the message bubble
-        bubble.append(messageLabel);
-        bubble.append(timeLabel);
-
-        // Add the bubble to the message box
-        messageBox.append(bubble);
-
-        return messageBox;
     }
 
     private showWelcomeScreen(): void {
-        // Hide the message container and show welcome container
-        if (this.messageContainer) {
-            this.messageContainer.visible = false;
+        // CRITICAL FIX: Retrieve ChatContent fresh to avoid context loss
+        const chatContent = this.get_template_child(ChatView.$gtype, "chatContent") as ChatContent;
+        if (chatContent) {
+            chatContent.visible = false;
         }
+
         if (this.welcomeContainer) {
             // Create and show the welcome screen
             if (!this.welcomeScreen) {

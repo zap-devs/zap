@@ -12,6 +12,7 @@ typescript_sources = files(
   'features/auth/welcome/welcome.ts',
   'features/chat/chat-view/chat-view.ts',
   'features/chat/chat-welcome/chat-welcome.ts',
+  'features/chat/chat-content/chat-content.ts',
 
   # Shared files
   'shared/index.ts',
@@ -33,6 +34,7 @@ blueprint_files = files(
   'features/auth/welcome/welcome.blp',
   'features/chat/chat-view/chat-view.blp',
   'features/chat/chat-welcome/chat-welcome.blp',
+  'features/chat/chat-content/chat-content.blp',
   'resources/help-overlay.blp',
 )
 

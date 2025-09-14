@@ -1,111 +1,247 @@
-# GNOME Typescript Template
+# Zap - Modern GTK WhatsApp-Style Chat Application
 
-A template that provides the basic foundations for GNOME applications written in Typescript.
+A beautiful, modern chat application built with GTK 4 and libadwaita, designed to provide a WhatsApp-style messaging experience on the GNOME desktop.
 
-![The main view of the Typescript Template application.](./data/screenshots/screenshot-1.png)
+> [!IMPORTANT]
+> This project is not affiliated with, endorsed by, or associated with WhatsApp, Meta Platforms Inc., or any of their subsidiaries. This is an independent open-source project inspired by modern chat application design patterns.
 
-## Template Features
+![Zap Screenshot](data/screenshots/screenshot-1.png)
 
-This template provides:
+## Features
 
-* A main window using modern libadwaita widgets and best practices
-* A starting point for metadata, desktop files, and icons
-* A flatpak manifest for nightly builds
-* A GitLab CI configuration that produces flatpak bundles
-* A stub for translation support
-* Thoroughly commented code to assist with learning
+- **Modern GTK 4 Interface**: Built with the latest GTK 4 and libadwaita for a native GNOME experience
+- **WhatsApp-Style Design**: Familiar chat interface with modern design patterns
+- **Multi-Platform**: Distributed via Flatpak for easy installation across Linux distributions
+- **TypeScript Development**: Type-safe development with TypeScript and proper type definitions
+- **Responsive Layout**: Adaptive interface that works well on different screen sizes
+- **Native GNOME Integration**: Follows GNOME Human Interface Guidelines and integrates seamlessly with the desktop
 
-## Getting Started
+## Screenshots
 
-This template comes with a `create-project.py` script. When you're ready to initialize your project,
-navigate to your checkout of the template and run the following command in the terminal:
+![Chat Interface](data/screenshots/screenshot-1.png)
+*Main chat interface with conversation view*
 
-```
-# NOTE: Don't copy the `$`. It's simply an indicator
-# that you should run a command as a regular user.
-$ python3 create-project.py
-```
+![Welcome Screen](data/screenshots/screenshot-2.png)
+*Welcome screen with modern design*
 
-The script will ask you for your project name, application id, and author information and then
-replace the placeholder values in the template with the values you provide. Once finished,
-you will find a folder with the project name you gave the script in the template repo. Move
-this folder to wherever you store your projects.
+## Technology Stack
 
-## Setting Up Your Development Environment
+- **Language**: TypeScript (compiled to JavaScript for GJS runtime)
+- **UI Framework**: GTK 4 + libadwaita 1.x with Blueprint markup
+- **Runtime**: GJS (GNOME JavaScript) with GObject introspection
+- **Build System**: Meson + Blueprint compiler + TypeScript compiler
+- **Package Manager**: Bun (for TypeScript tooling)
+- **Distribution**: Flatpak
 
-### Visual Studio Code
+## Prerequisites
 
-When working with Typescript, I currently recommend using [Visual Studio Code](https://flathub.org/apps/com.visualstudio.code).
-VSCode has many well-supported extensions for JavaScript and TypeScript. You will need the following extensions in VSCode:
+Before building Zap, ensure you have the following dependencies installed:
 
-* ESLint by Microsoft
-* Prettier ESLint by Rebecca Vest
-* Flatpak by Bilal Elmoussaoui
-* XML by Red Hat
-* EditorConfig for VS Code by EditorConfig
-* Meson by mesonbuild
+- Bun (for TypeScript compilation and tooling)
+- Meson build system (>= 0.62.0)
+- Blueprint compiler (`blueprint-compiler`)
+- Flatpak development tools
+- GTK 4 and libadwaita development libraries
+- GJS (>= 1.54.0)
 
-### Flatpak
+### Installing Dependencies
 
-You will also need to install the GNOME Nightly flatpak SDK and the Node and Typescript
-SDK extensions. First, add the flatpak repositories if you have not already configured them.
-In a terminal, run:
-
-```
-$ flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-$ flatpak remote-add --user --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
-$ flatpak remote-add --user --if-not-exists gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo
+On Fedora/RHEL:
+```bash
+sudo dnf install meson blueprint-compiler flatpak-builder gtk4-devel libadwaita-devel gjs
 ```
 
-Then install the SDKs and extensions:
-
-```
-$ flatpak --user install org.gnome.Sdk//master org.gnome.Platform//master
-$ flatpak --user install org.freedesktop.Sdk.Extension.node20//24.08beta org.freedesktop.Sdk.Extension.typescript//24.08beta
+On Ubuntu/Debian:
+```bash
+sudo apt install meson blueprint-compiler flatpak-builder libgtk-4-dev libadwaita-1-dev gjs
 ```
 
-Also ensure that you have `flatpak-builder` installed.
-
-### Node Package Manager & ESLint
-
-This step is optional, but highly recommended for setting up linting and code formattting.
-Install `npm`, then run `npm install` in your project directory.
-
-## Building & Running Your App
-
-### In VS Code
-
-When you open your project directory in VS Code, you should see a box icon on the bottom left
-of your screen with your application ID. If you see this and no errors, that means that the
-flatpak VS Code extension properly loaded your project.
-
-Open your command palette (View -> Command Palette in the menu bar, or Ctrl+Shift+P) and
-type "Flatpak". Select "Flatpak: Build" from the list. Once the build is done, open the
-command palette again and select "Flatpak: Run". You should see the window depicted in
-the screenshot at the top of this file.
-
-After your initial build, you can use the "Flatpak: Build and Run" action from the
-command palette to do both steps at once.
-
-### In The Terminal
-
-To build the application, run:
-
-```
-$ flatpak-builder --user flatpak_app build-aux/flatpak/<application_id>.json
+On Arch Linux:
+```bash
+sudo pacman -S meson blueprint-compiler flatpak-builder gtk4 libadwaita gjs
 ```
 
-And to run the application:
+Install Bun:
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+## Installation
+
+### From Flatpak (Recommended)
+
+```bash
+# Add Flathub repository (if not already added)
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+# Install Zap
+flatpak install sh.alisson.Zap
+```
+
+### Building from Source
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/alissonlauand/zap.git
+cd zap
+```
+
+2. **Install TypeScript dependencies:**
+```bash
+bun install
+```
+
+3. **Configure and build with Meson:**
+```bash
+meson setup builddir
+meson compile -C builddir
+```
+
+4. **Install locally (optional):**
+```bash
+meson install -C builddir
+```
+
+## Development
+
+### Setting Up Development Environment
+
+1. **Configure debug build:**
+```bash
+meson setup builddir --buildtype=debug
+```
+
+2. **Compile TypeScript and Blueprint files:**
+```bash
+meson compile -C builddir
+```
+
+3. **Run the application in development mode:**
+```bash
+meson devenv -C builddir ninja devel
+```
+
+### Build Commands
+
+**Development Build:**
+```bash
+meson setup builddir --buildtype=debug
+meson compile -C builddir
+meson devenv -C builddir ./builddir/src/sh.alisson.Zap
+```
+
+**Production Build:**
+```bash
+meson setup builddir --buildtype=release
+meson compile -C builddir
+flatpak-builder --repo=repo build-aux/flatpak/sh.alisson.Zap.json
+```
+
+**TypeScript Compilation Only:**
+```bash
+# Type check without emitting files
+bun run tsc --strict --noEmit
+
+# Build TypeScript files to JavaScript
+bun run tsc --strict
+```
+
+### Testing
+
+**TypeScript Type Checking:**
+```bash
+bun run tsc --strict --noEmit
+```
+
+**Run Application:**
+```bash
+meson devenv -C builddir ./builddir/src/sh.alisson.Zap
+```
+
+**Test Flatpak Build:**
+```bash
+flatpak-builder --user --install --force-clean build-aux/flatpak/sh.alisson.Zap.json
+flatpak run sh.alisson.Zap
+```
+
+### Debugging
+
+**Enable GTK Debug Output:**
+```bash
+GTK_DEBUG=all meson devenv -C builddir ./builddir/src/sh.alisson.Zap
+```
+
+**Debug Specific GTK Modules:**
+```bash
+GTK_DEBUG=actions,widgets meson devenv -C builddir ./builddir/src/sh.alisson.Zap
+```
+
+**GJS Debugging:**
+```bash
+gjs -d ./builddir/src/sh.alisson.Zap
+```
+
+## Project Structure
 
 ```
-$ flatpak-builder --run flatpak_app build-aux/flatpak/<application_id>.json
+zap/
+├── src/                          # Source code
+│   ├── core/                     # Core application components
+│   │   ├── logger.ts            # Centralized logging
+│   │   └── window/              # Main window with navigation
+│   ├── features/                # Feature-specific modules
+│   │   ├── auth/                # Authentication features
+│   │   └── chat/                # Chat features
+│   ├── shared/                  # Shared utilities and services
+│   ├── resources/               # Resource files (styles, gresource.xml)
+│   └── types/                   # TypeScript type definitions
+├── data/                        # Application data and icons
+├── po/                          # Translation files
+├── build-aux/                   # Build configuration
+└── src/                         # TypeScript source files
 ```
 
-## References
+## Contributing
 
-For the next steps in your application development journey, visit the following links:
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
-* Read our [Developer Documentation](https://developer.gnome.org/documentation/) for tutorials and references.
-* Read our [Human Interface Guidelines](https://developer.gnome.org/hig/) to learn the best practices for designing a GNOME application.
-* Visit [gjs.guide](https://gjs.guide/) for a comprehensive overview of GJS.
-* If you plan to host your repo on GitHub, set up [flatpak-github-actions](https://github.com/flatpak/flatpak-github-actions).
+### Quick Start for Contributors
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run type checking (`bun run tsc --strict --noEmit`)
+5. Commit your changes (`git commit -m 'Add some amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+### Code Style
+
+- Use strict TypeScript configuration with explicit types
+- Follow GNOME Human Interface Guidelines
+- Use libadwaita widgets (Adw.*) over plain GTK when available
+- Keep UI definitions separate in .blp files
+- Use CSS classes for styling, avoid inline styles
+
+## License
+
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Built with [GTK](https://gtk.org/) and [libadwaita](https://gnome.pages.gitlab.gnome.org/libadwaita/)
+- Uses [GJS](https://gitlab.gnome.org/GNOME/gjs/) for JavaScript bindings
+- Inspired by modern chat applications and GNOME design principles
+
+## Support
+
+If you encounter any issues or have questions:
+
+- Create an issue on [GitHub Issues](https://github.com/alissonlauand/zap/issues)
+- Check the [Wiki](https://github.com/alissonlauand/zap/wiki) for documentation
+- Join our [Discussions](https://github.com/alissonlauand/zap/discussions)
+
+---
+
+> [!NOTE]
+> This is a desktop application that requires a Linux environment with GTK 4 support. For the best experience, we recommend using GNOME or a GTK-based desktop environment.

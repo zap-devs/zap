@@ -459,12 +459,12 @@ export class ChatView extends Adw.Bin {
                     transient_for: window,
                     application_name: "Zap",
                     application_icon: "sh.alisson.Zap",
-                    developer_name: "Alisson",
+                    developer_name: "Alisson Lauffer",
                     version: "1.0.0",
-                    developers: ["Alisson"],
-                    copyright: "© 2024 Alisson",
-                    license_type: Gtk.License.GPL_3_0,
-                    website: "https://github.com/alisson/zap",
+                    developers: ["Alisson Lauffer"],
+                    copyright: "© 2025 Alisson Lauffer",
+                    license_type: Gtk.License.MIT_X11,
+                    website: "https://github.com/alissonlauffer/zap",
                 });
                 aboutDialog.present();
             }

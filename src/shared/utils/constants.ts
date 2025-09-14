@@ -20,9 +20,9 @@ export const APP_CONSTANTS = {
     /** Developer contact */
     DEVELOPER_CONTACT: "me@alisson.sh",
     /** Application website */
-    WEBSITE: "https://github.com/alisson/zap",
+    WEBSITE: "https://github.com/alissonlauffer/zap",
     /** Copyright information */
-    COPYRIGHT: "© 2024 Alisson Lauffer",
+    COPYRIGHT: "© 2025 Alisson Lauffer",
     /** License type */
     LICENSE: "MIT",
 } as const;

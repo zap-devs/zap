@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2023 Alisson Lauffer -->
+<!-- Copyright 2025 Alisson Lauffer -->
 <component type="desktop">
   <id>sh.alisson.Zap</id>
   <name>Zap</name>
-  <summary>Use this template to build your GNOME + Typescript application</summary>
+  <summary>Unofficial WhatsApp client for GNOME</summary>
   <!-- IMPORTANT: Change these to match the actual license of your app-->
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <developer_name>Alisson Lauffer</developer_name>
   <update_contact>me@alisson.sh</update_contact>
   <description>
-    <p>Use this template to build your GNOME + Typescript application.</p>
+    <p>Zap is an unofficial WhatsApp client for the GNOME desktop environment, built with TypeScript and GTK 4/libadwaita.</p>
+    <p>NOTE: This is an unofficial client and is not affiliated with or endorsed by WhatsApp Inc.</p>
   </description>
   <screenshots>
     <screenshot type="default">
@@ -29,7 +30,7 @@
   your app -->
   <content_rating type="oars-1.1" />
   <releases>
-    <release version="0.1" date="2023-06-15" />
+    <release version="0.1" date="2025-09-14" />
   </releases>
   <url type="homepage">https://gitlab.gnome.org</url>
 </component>

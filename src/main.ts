@@ -87,7 +87,8 @@ export class Application extends Adw.Application {
                 developer_name: "Alisson Lauffer",
                 version: "0.1",
                 developers: ["Alisson Lauffer <me@alisson.sh>"],
-                copyright: "© 2023 Alisson Lauffer",
+                copyright: "© 2025 Alisson Lauffer",
+                comments: _("An unofficial WhatsApp client for GNOME"),
             });
 
             aboutDialog.present(this.active_window);

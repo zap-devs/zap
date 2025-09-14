@@ -9,6 +9,7 @@ import { Window } from "./core/window/window.js";
 import { LoginPage } from "./features/auth/login/login.js";
 import { WelcomePage } from "./features/auth/welcome/welcome.js";
 import { ChatContent } from "./features/chat/chat-content/chat-content.js";
+import { ChatListItem } from "./features/chat/chat-list-item/chat-list-item.js";
 import { ChatView } from "./features/chat/chat-view/chat-view.js";
 
 /**
@@ -165,6 +166,7 @@ export function main(argv: string[]): Promise<number> {
     void LoginPage;
     void ChatView;
     void ChatContent;
+    void ChatListItem;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
     return app.runAsync(argv);

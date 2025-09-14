@@ -1,10 +1,11 @@
 import Adw from "gi://Adw?version=1";
 import Gio from "gi://Gio?version=2.0";
 import GObject from "gi://GObject?version=2.0";
-import Gtk from "gi://Gtk?version=4.0";
+import type Gtk from "gi://Gtk?version=4.0";
 import { logger } from "../../../core/logger.js";
 import type { Chat, Message } from "../../../shared/models/chat.model.js";
 import type { ChatContent } from "../chat-content/chat-content.js";
+import { ChatListItem } from "../chat-list-item/chat-list-item.js";
 import { ChatWelcome } from "../chat-welcome/chat-welcome.js";
 
 export class ChatView extends Adw.Bin {
@@ -131,60 +132,21 @@ export class ChatView extends Adw.Bin {
                 child = next;
             }
 
-            // Create fancy chat rows using Adw.ActionRow
+            // Create ChatListItem components for each chat
             const chats = this.chats; // Store reference to avoid closure issues
             for (let i = 0; i < chats.length; i++) {
                 const chat = chats[i];
 
-                // Create ActionRow for each chat
-                const row = new Adw.ActionRow({
-                    title: chat.name,
-                    subtitle: chat.lastMessage,
-                    activatable: true,
-                    css_classes: ["chat-row"],
-                });
+                // Create ChatListItem for each chat
+                const chatItem = new ChatListItem();
+                chatItem.setChatData(chat);
 
-                // Add timestamp and unread count
-                const endBox = new Gtk.Box({
-                    orientation: Gtk.Orientation.HORIZONTAL,
-                    spacing: 6,
-                    valign: Gtk.Align.CENTER,
-                    css_classes: ["chat-meta-box"],
-                });
-
-                // Timestamp label
-                const timeLabel = new Gtk.Label({
-                    label: chat.timestamp,
-                    css_classes: ["caption", "dim-label", "chat-timestamp"],
-                });
-
-                // Unread badge if there are unread messages
-                if (chat.unreadCount > 0) {
-                    const unreadBadge = new Gtk.Label({
-                        label: chat.unreadCount.toString(),
-                        css_classes: ["badge", "unread-badge"],
-                    });
-                    endBox.append(unreadBadge);
-                }
-
-                endBox.append(timeLabel);
-                row.add_suffix(endBox);
-
-                // Add avatar or icon
-                const avatar = new Adw.Avatar({
-                    text: chat.name,
-                    size: 40,
-                    show_initials: true,
-                    css_classes: ["chat-avatar"],
-                });
-                row.add_prefix(avatar);
-
-                // Store chat index and all necessary references in the closure
+                // Store chat data and all necessary references in the closure
                 const chatData = chat; // Store the actual chat data
                 const welcomeContainer = this.welcomeContainer;
 
                 // Connect to row activation
-                row.connect("activated", () => {
+                chatItem.connect("activated", () => {
                     logger.info(`Chat selected: ${chatData.name} (ID: ${chatData.id})`);
 
                     // Hide welcome container and show chat content
@@ -197,7 +159,7 @@ export class ChatView extends Adw.Bin {
                     this.loadMessagesForChat(chatData.id);
                 });
 
-                this.listBox.append(row);
+                this.listBox.append(chatItem);
             }
 
             logger.info("Chat list initialized successfully");

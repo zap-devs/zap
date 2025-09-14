@@ -44,6 +44,19 @@
   background-color: var(--chat-sent-bg-color-light);
 }
 
+/* Chat list item styling */
+.chat-row {
+  padding: 8px 12px;
+}
+
+.chat-avatar {
+  margin-right: 12px;
+}
+
+.chat-meta-box {
+  margin-left: 12px;
+}
+
 .unread-badge {
   background-color: var(--accent-bg-color);
   color: var(--accent-fg-color);

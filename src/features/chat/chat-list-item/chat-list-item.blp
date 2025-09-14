@@ -1,0 +1,44 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $Gjs_ChatListItem: Adw.ActionRow {
+  activatable: true;
+  styles ["chat-row"]
+
+  // Avatar prefix
+  [prefix]
+  Adw.Avatar chatAvatar {
+    size: 40;
+    show-initials: true;
+    styles ["chat-avatar"]
+  }
+
+  // Meta information suffix
+  [suffix]
+  Box chatMetaBox {
+    orientation: horizontal;
+    spacing: 6;
+    valign: center;
+    styles ["chat-meta-box"]
+
+    Box {
+      orientation: vertical;
+      spacing: 6;
+
+      Box {
+        halign: end;
+
+        // Unread badge (will be shown/hidden dynamically)
+        Label unreadBadge {
+          visible: false;
+          styles ["badge", "unread-badge"]
+        }
+      }
+
+      // Timestamp
+      Label timestampLabel {
+        styles ["caption", "dim-label", "chat-timestamp"]
+      }
+    }
+  }
+}

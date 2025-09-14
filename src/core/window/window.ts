@@ -114,6 +114,16 @@ export class Window extends Adw.ApplicationWindow {
 
         // Try to get the stack widget using get_template_child
         this._stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
+        logger.debug(`Window constructed, stack initialized: ${this._stack ? 'success' : 'null'}`);
+
+        // Add a safety check - ensure the stack is properly initialized
+        if (!this._stack) {
+            logger.error("Stack is null after template child retrieval in vfunc_constructed");
+            return;
+        }
+
+        logger.debug(`Stack object stored: ${this._stack}`);
+        logger.debug(`Stack constructor: ${this._stack.constructor.name}`);
 
         // Action to show the login screen
         this.showLoginAction = new Gio.SimpleAction({
@@ -121,9 +131,22 @@ export class Window extends Adw.ApplicationWindow {
         });
 
         this.showLoginAction.connect("activate", () => {
-            const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
-            if (stack) {
-                stack.visible_child_name = "login";
+            logger.debug("show-login action triggered");
+            try {
+                // Try to get the stack directly from the window using get_template_child
+                const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
+                logger.debug(`Stack retrieved in action: ${stack}`);
+                logger.debug(`Stack type in action: ${stack?.constructor.name}`);
+
+                if (stack) {
+                    logger.debug(`Current stack page: ${stack.visible_child_name}`);
+                    stack.visible_child_name = "login";
+                    logger.debug(`Stack page changed to: ${stack.visible_child_name}`);
+                } else {
+                    logger.error("Could not retrieve stack in show-login action");
+                }
+            } catch (error) {
+                logger.error("Error in show-login action:", error);
             }
         });
 
@@ -147,27 +170,89 @@ export class Window extends Adw.ApplicationWindow {
         try {
             logger.info("Login action triggered");
 
+            // Get the stack fresh each time to avoid context issues
             const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
             if (!stack) {
-                logger.error("Stack widget not found");
+                logger.error("Could not retrieve stack in handleLogin");
                 return;
             }
 
-            const loginPage = stack.get_child_by_name("login");
+            logger.debug(`Stack retrieved in handleLogin: ${stack}`);
+            logger.debug(`Stack type in handleLogin: ${stack.constructor.name}`);
+
+            // Get the currently visible child - this should be the LoginPage
+            const loginPage = stack.visible_child;
+            logger.debug(`Currently visible child: ${loginPage?.constructor.name}`);
+
             if (!(loginPage instanceof LoginPage)) {
-                logger.error("Login page not found or invalid type");
+                logger.error(`Visible child is not a LoginPage: ${loginPage?.constructor.name}`);
+
+                // Fallback: try to get by name if not currently visible
+                const fallbackLoginPage = stack.get_child_by_name("login");
+                if (fallbackLoginPage instanceof LoginPage) {
+                    logger.debug("Using fallback login page found by name");
+                    this.handleLoginPage(fallbackLoginPage, stack);
+                } else {
+                    logger.error("Could not find LoginPage instance");
+                }
                 return;
             }
 
+            logger.debug(`Found LoginPage instance: ${loginPage.constructor.name}`);
+            this.handleLoginPage(loginPage, stack);
+
+        } catch (error) {
+            logger.error("Login process failed:", error);
+        }
+    }
+
+    /**
+     * Handle login with a specific LoginPage instance
+     */
+    private async handleLoginPage(loginPage: LoginPage, stack: Adw.ViewStack): Promise<void> {
+        try {
+            logger.debug(`Using login page instance: ${loginPage.constructor.name}`);
+
+            // Add a small delay to ensure the LoginPage is fully constructed
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Test if this login page has template children
+            const testPhoneNumber = loginPage.getPhoneNumber();
+            logger.debug(`Test phone number from login page: "${testPhoneNumber}" (template children check)`);
+
+            if (testPhoneNumber === "") {
+                logger.error("Login page does not have template children (phone entry is null)");
+
+                // Try to force template child retrieval
+                try {
+                    logger.debug("Attempting to force template child retrieval");
+                    const phoneEntry = loginPage.get_template_child(LoginPage.$gtype, "phoneEntry") as any;
+                    if (phoneEntry) {
+                        logger.debug("Successfully retrieved phone entry via get_template_child");
+                        // Manually set the phone entry if we can get it
+                        (loginPage as any).phoneEntry = phoneEntry;
+                    } else {
+                        logger.error("Could not retrieve phone entry via get_template_child");
+                        loginPage.showError("Internal error: Could not access phone entry field");
+                        return;
+                    }
+                } catch (templateError) {
+                    logger.error("Failed to force template child retrieval:", templateError);
+                    loginPage.showError("Internal error: Template children not available");
+                    return;
+                }
+            }
+
+            logger.debug(`About to call getPhoneNumber on login page instance`);
             const phoneNumber = loginPage.getPhoneNumber();
             logger.info(`Login attempt with phone number: "${phoneNumber}"`);
 
             // Check if phone number is empty first
-            // if (!phoneNumber || phoneNumber.trim().length === 0) {
-            //     logger.warn("Login attempt with empty phone number");
-            //     loginPage.showError("Please enter a phone number");
-            //     return;
-            // }
+            if (!phoneNumber || phoneNumber.trim().length === 0) {
+                logger.warn("Login attempt with empty phone number");
+                loginPage.showError("Please enter a phone number");
+                return;
+            }
 
             // Validate phone number using the login page's validation
             const isValid = loginPage.isValid();
@@ -183,7 +268,7 @@ export class Window extends Adw.ApplicationWindow {
 
             if (!loginResult.success) {
                 logger.error(`Login failed: ${loginResult.error}`);
-                // TODO: Show error message to user
+                loginPage.showError(loginResult.error || "Login failed");
                 return;
             }
 
@@ -206,7 +291,8 @@ export class Window extends Adw.ApplicationWindow {
             logger.info("Navigation to chat view completed");
         } catch (error) {
             logger.error("Login process failed:", error);
-            // TODO: Show error message to user
+            // Show error to user
+            loginPage.showError("An error occurred during login");
         }
     }
 }

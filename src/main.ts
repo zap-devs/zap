@@ -111,7 +111,7 @@ export class Application extends Adw.Application {
             logger.setLogLevel(LogLevel.DEBUG);
             logger.info("Logger initialized in DEBUG mode");
         } else {
-            logger.setLogLevel(LogLevel.INFO);
+            logger.setLogLevel(LogLevel.DEBUG);
             logger.info("Logger initialized in INFO mode");
         }
     }

@@ -7,6 +7,7 @@ import { validatePhoneNumber } from "../../../shared/utils/validation.js";
 export class LoginPage extends Adw.Bin {
     private phoneEntry!: Gtk.Entry;
     private errorLabel!: Gtk.Label;
+    private instanceId: string;
 
     static {
         GObject.registerClass(
@@ -18,16 +19,28 @@ export class LoginPage extends Adw.Bin {
         );
     }
 
+    constructor(params?: Partial<Adw.Bin.ConstructorProps>) {
+        super(params);
+        this.instanceId = Math.random().toString(36).substr(2, 9);
+        logger.debug(`LoginPage constructor called, instance ID: ${this.instanceId}`);
+    }
+
     public vfunc_constructed(): void {
         super.vfunc_constructed();
         try {
+            logger.debug(`LoginPage vfunc_constructed called, instance ID: ${this.instanceId}`);
+
+            // Try to get template children
             this.phoneEntry = this.get_template_child(LoginPage.$gtype, "phoneEntry") as Gtk.Entry;
+            logger.debug(`Phone entry retrieved: ${this.phoneEntry ? 'success' : 'null'} (instance: ${this.instanceId})`);
+
             this.errorLabel = this.get_template_child(LoginPage.$gtype, "errorLabel") as Gtk.Label;
+            logger.debug(`Error label retrieved: ${this.errorLabel ? 'success' : 'null'} (instance: ${this.instanceId})`);
 
             // Set up validation and error handling
             this.setupValidation();
 
-            logger.info("LoginPage constructed successfully");
+            logger.info(`LoginPage constructed successfully (instance: ${this.instanceId})`);
         } catch (error) {
             logger.error("Failed to initialize LoginPage:", error);
         }
@@ -37,7 +50,10 @@ export class LoginPage extends Adw.Bin {
      * Set up input validation and error handling
      */
     private setupValidation(): void {
-        if (!this.phoneEntry) return;
+        if (!this.phoneEntry) {
+            logger.error(`Phone entry is null in setupValidation (instance: ${this.instanceId})`);
+            return;
+        }
 
         // Connect to text change events for real-time validation
         this.phoneEntry.connect("changed", () => {
@@ -61,6 +77,8 @@ export class LoginPage extends Adw.Bin {
                 }
             }
         });
+
+        logger.debug(`Login page validation setup completed (instance: ${this.instanceId})`);
     }
 
     /**
@@ -108,7 +126,7 @@ export class LoginPage extends Adw.Bin {
             this.phoneEntry.add_css_class("error");
         }
 
-        logger.warn(`Login validation error: ${message}`);
+        logger.warn(`Login validation error: ${message} (instance: ${this.instanceId})`);
     }
 
     /**
@@ -131,12 +149,13 @@ export class LoginPage extends Adw.Bin {
      * Get the phone number from the input field
      */
     public getPhoneNumber(): string {
+        logger.debug(`getPhoneNumber called (instance: ${this.instanceId}), phoneEntry: ${this.phoneEntry ? 'exists' : 'null'}`);
         if (this.phoneEntry) {
             const text = this.phoneEntry.get_text().trim();
-            logger.debug(`Getting phone number from entry: "${text}"`);
+            logger.debug(`Getting phone number from entry: "${text}" (instance: ${this.instanceId})`);
             return text;
         }
-        logger.debug("Phone entry not found, returning empty string");
+        logger.debug(`Phone entry not found, returning empty string (instance: ${this.instanceId})`);
         return "";
     }
 

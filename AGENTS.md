@@ -129,7 +129,7 @@ const settingsAction = new Gio.SimpleAction({ name: "settings" });
 this.add_action(settingsAction);
 ```
 
-## Common GTK/libadwaita Mistakes to Avoid
+## Critical GTK/libadwaita Mistakes to Avoid
 
 ### 1. Missing GObject Registration
 ```typescript
@@ -215,6 +215,25 @@ import Gtk from "gi://Gtk?version=4.0";
 // Only fix CSS errors that actually break the GTK styling.
 ```
 
+### 8. JavaScript Context Loss in GJS Action Callbacks (CRITICAL)
+```typescript
+// WRONG: Relying on cached this._stack reference in action callbacks
+this.showLoginAction.connect("activate", () => {
+    this._stack.visible_child_name = "login"; // this._stack may be undefined!
+});
+
+// CORRECT: Retrieve template children fresh in each action callback
+this.showLoginAction.connect("activate", () => {
+    const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
+    if (stack) {
+        stack.visible_child_name = "login";
+    }
+});
+
+// CRITICAL INSIGHT: GJS action callbacks can lose context, causing 'this' references
+// to become undefined. Always retrieve template children fresh in action callbacks.
+```
+
 ## Code Style and Conventions
 
 ### TypeScript
@@ -272,6 +291,73 @@ import Gtk from "gi://Gtk?version=4.0";
 ### Build Configuration
 - `src/meson.build` - Meson build configuration with modular source organization
 
+## Critical Issue: JavaScript Context Loss in GJS Action Callbacks
+
+### Problem
+GJS (GNOME JavaScript) can lose the `this` context in action callbacks, causing template child references to become `undefined`. This manifests as:
+
+- `this._stack` being `undefined` in action callbacks
+- Template children not being accessible
+- Actions appearing to work but failing silently
+
+### Root Cause
+The JavaScript context binding in GJS action callbacks can break, especially with template children stored as instance properties.
+
+### Solution
+**Always retrieve template children fresh in action callbacks:**
+
+```typescript
+// CORRECT: Retrieve fresh each time
+private setupActions(): void {
+    const action = new Gio.SimpleAction({ name: "my-action" });
+    action.connect("activate", () => {
+        // Retrieve template child fresh each time
+        const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
+        const widget = this.get_template_child(MyWindow.$gtype, "myWidget") as Gtk.Widget;
+
+        if (stack && widget) {
+            // Use the retrieved widgets
+            stack.visible_child_name = "mypage";
+        }
+    });
+    this.add_action(action);
+}
+
+// INCORRECT: Relying on cached reference (may become undefined)
+private setupActions(): void {
+    const action = new Gio.SimpleAction({ name: "my-action" });
+    action.connect("activate", () => {
+        this._stack.visible_child_name = "mypage"; // this._stack may be undefined!
+    });
+    this.add_action(action);
+}
+```
+
+### Real-World Example: Login Page Fix
+The login page issue was resolved by:
+
+1. **Fresh stack retrieval** in both show-login and login actions
+2. **Forced template child retrieval** when LoginPage lacks template children
+3. **Proper error handling** with fallback mechanisms
+
+```typescript
+// In action callback - retrieve fresh
+const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
+const loginPage = stack.visible_child as LoginPage;
+
+// Force template children if missing
+if (!loginPage.getPhoneNumber()) {
+    const phoneEntry = loginPage.get_template_child(LoginPage.$gtype, "phoneEntry") as Gtk.Entry;
+    (loginPage as any).phoneEntry = phoneEntry;
+}
+```
+
+### Prevention
+- Never rely on `this.property` in action callbacks
+- Always use `get_template_child()` to retrieve widgets fresh
+- Add comprehensive error logging to detect context loss
+- Test actions thoroughly in development mode
+
 ## Testing
 
 ### TypeScript Type Checking
@@ -314,6 +400,7 @@ gjs -d ./builddir/src/sh.alisson.Zap
 - **Widget not found**: Check InternalChildren array matches Blueprint IDs exactly
 - **TypeScript errors**: Verify all template children use `!` and proper typing
 - **Blueprint compilation fails**: Check semicolon usage and property syntax
+- **JavaScript context loss**: Retrieve template children fresh in action callbacks (see Critical Pattern above)
 
 ## Resource Management
 

@@ -203,8 +203,7 @@ export class Window extends Adw.ApplicationWindow {
             logger.info("About action triggered");
 
             // Show about dialog
-            const aboutDialog = new Adw.AboutWindow({
-                transient_for: this,
+            const aboutDialog = new Adw.AboutDialog({
                 application_name: "Zap",
                 application_icon: "sh.alisson.Zap",
                 developer_name: "Alisson Lauffer",
@@ -214,7 +213,7 @@ export class Window extends Adw.ApplicationWindow {
                 license_type: Gtk.License.MIT_X11,
                 website: "https://github.com/alissonlauffer/zap",
             });
-            aboutDialog.present();
+            aboutDialog.present(this);
         });
 
         this.add_action(this.showLoginAction);

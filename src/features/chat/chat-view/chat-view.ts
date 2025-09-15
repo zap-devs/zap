@@ -147,6 +147,10 @@ export class ChatView extends Adw.Bin {
                 chatItem.connect("activated", () => {
                     logger.info(`Chat selected: ${chatData.name} (ID: ${chatData.id})`);
 
+                    // Update the conversation name in the header
+                    this.setUserName(chatData.name);
+                    logger.info(`Updated userNameLabel to: ${chatData.name}`);
+
                     // Hide welcome container and show chat content
                     if (welcomeContainer) {
                         welcomeContainer.visible = false;
@@ -277,6 +281,10 @@ export class ChatView extends Adw.Bin {
     private showWelcomeScreen(): void {
         logger.info(`=== SHOW WELCOME SCREEN ===`);
 
+        // Reset conversation name to default when showing welcome screen
+        this.setUserName("Chat");
+        logger.info("Reset userNameLabel to 'Chat' for welcome screen");
+
         // Retrieve ChatContent fresh to avoid context loss
         const chatContent = this.get_template_child(ChatView.$gtype, "chatContent") as ChatContent;
         logger.info(`ChatContent retrieved: ${!!chatContent}`);
@@ -336,40 +344,15 @@ export class ChatView extends Adw.Bin {
                 ChatView.$gtype,
                 "split_view",
             ) as Adw.NavigationSplitView;
-            const backButton = this.get_template_child(
-                ChatView.$gtype,
-                "backButton",
-            ) as Gtk.Button;
 
             if (!splitView) {
                 logger.error("Split view not found in setupNavigationHandling");
                 return;
             }
 
-            if (!backButton) {
-                logger.error("Back button not found in setupNavigationHandling");
-                return;
-            }
-
             // Connect to split view collapsed state changes
             splitView.connect("notify::collapsed", () => {
                 logger.info(`Split view collapsed state changed: ${splitView.collapsed}`);
-
-                // Hide back button when not collapsed (desktop view)
-                if (!splitView.collapsed) {
-                    backButton.visible = false;
-                }
-            });
-
-            // Setup back button click handler
-            backButton.connect("clicked", () => {
-                logger.info("Back button clicked - returning to sidebar");
-
-                // Navigate back to sidebar in mobile view
-                if (splitView.collapsed) {
-                    splitView.show_content = false;
-                    backButton.visible = false;
-                }
             });
 
             logger.info("Navigation handling setup completed");

@@ -272,42 +272,6 @@ export class Window extends Adw.ApplicationWindow {
         try {
             logger.debug(`Using login page instance: ${loginPage.constructor.name}`);
 
-            // Add a small delay to ensure the LoginPage is fully constructed
-            await new Promise((resolve) => setTimeout(resolve, 100));
-
-            // Test if this login page has template children
-            const testPhoneNumber = loginPage.getPhoneNumber();
-            logger.debug(
-                `Test phone number from login page: "${testPhoneNumber}" (template children check)`,
-            );
-
-            if (testPhoneNumber === "") {
-                logger.error("Login page does not have template children (phone entry is null)");
-
-                // Try to force template child retrieval
-                try {
-                    logger.debug("Attempting to force template child retrieval");
-                    const phoneEntry = loginPage.get_template_child(
-                        LoginPage.$gtype,
-                        "phoneEntry",
-                    ) as any;
-                    if (phoneEntry) {
-                        logger.debug("Successfully retrieved phone entry via get_template_child");
-                        // Manually set the phone entry if we can get it
-                        (loginPage as any).phoneEntry = phoneEntry;
-                    } else {
-                        logger.error("Could not retrieve phone entry via get_template_child");
-                        loginPage.showError("Internal error: Could not access phone entry field");
-                        return;
-                    }
-                } catch (templateError) {
-                    logger.error("Failed to force template child retrieval:", templateError);
-                    loginPage.showError("Internal error: Template children not available");
-                    return;
-                }
-            }
-
-            logger.debug(`About to call getPhoneNumber on login page instance`);
             const phoneNumber = loginPage.getPhoneNumber();
             logger.info(`Login attempt with phone number: "${phoneNumber}"`);
 
@@ -337,18 +301,6 @@ export class Window extends Adw.ApplicationWindow {
             }
 
             logger.info(`Login successful for user: ${loginResult.data?.name || phoneNumber}`);
-
-            // Update application with user name
-            const app = this.get_application();
-            if (app && "setCurrentUserName" in app) {
-                (app as any).setCurrentUserName(loginResult.data?.name || phoneNumber);
-            }
-
-            // Update chat view with user name
-            const chatPage = stack.get_child_by_name("chat");
-            if (chatPage && "setUserName" in chatPage) {
-                (chatPage as any).setUserName(loginResult.data?.name || phoneNumber);
-            }
 
             // Navigate to chat view
             stack.visible_child_name = "chat";

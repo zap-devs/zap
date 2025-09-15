@@ -5,9 +5,8 @@ import { logger } from "../../../core/logger.js";
 import { validatePhoneNumber } from "../../../shared/utils/validation.js";
 
 export class LoginPage extends Adw.Bin {
-    private phoneEntry!: Gtk.Entry;
-    private errorLabel!: Gtk.Label;
-    private instanceId: string;
+    protected declare _phoneEntry: Gtk.Entry;
+    protected declare _errorLabel: Gtk.Label;
 
     static {
         GObject.registerClass(
@@ -17,72 +16,6 @@ export class LoginPage extends Adw.Bin {
             },
             LoginPage,
         );
-    }
-
-    constructor(params?: Partial<Adw.Bin.ConstructorProps>) {
-        super(params);
-        this.instanceId = Math.random().toString(36).substr(2, 9);
-        logger.debug(`LoginPage constructor called, instance ID: ${this.instanceId}`);
-    }
-
-    public vfunc_constructed(): void {
-        super.vfunc_constructed();
-        try {
-            logger.debug(`LoginPage vfunc_constructed called, instance ID: ${this.instanceId}`);
-
-            // Try to get template children
-            this.phoneEntry = this.get_template_child(LoginPage.$gtype, "phoneEntry") as Gtk.Entry;
-            logger.debug(
-                `Phone entry retrieved: ${this.phoneEntry ? "success" : "null"} (instance: ${this.instanceId})`,
-            );
-
-            this.errorLabel = this.get_template_child(LoginPage.$gtype, "errorLabel") as Gtk.Label;
-            logger.debug(
-                `Error label retrieved: ${this.errorLabel ? "success" : "null"} (instance: ${this.instanceId})`,
-            );
-
-            // Set up validation and error handling
-            this.setupValidation();
-
-            logger.info(`LoginPage constructed successfully (instance: ${this.instanceId})`);
-        } catch (error) {
-            logger.error("Failed to initialize LoginPage:", error);
-        }
-    }
-
-    /**
-     * Set up input validation and error handling
-     */
-    private setupValidation(): void {
-        if (!this.phoneEntry) {
-            logger.error(`Phone entry is null in setupValidation (instance: ${this.instanceId})`);
-            return;
-        }
-
-        // Connect to text change events for real-time validation
-        this.phoneEntry.connect("changed", () => {
-            this.clearError();
-        });
-
-        // Note: GTK 4 doesn't have focus-out signal on GtkEntry
-        // Validation will happen on form submission instead
-
-        // Connect to activate event (Enter key)
-        this.phoneEntry.connect("activate", () => {
-            this.validateInput();
-            if (this.isValid()) {
-                // Trigger login action
-                const window = this.get_root() as Adw.ApplicationWindow;
-                if (window) {
-                    const loginAction = window.lookup_action("win.login");
-                    if (loginAction) {
-                        loginAction.activate(null);
-                    }
-                }
-            }
-        });
-
-        logger.debug(`Login page validation setup completed (instance: ${this.instanceId})`);
     }
 
     /**
@@ -119,72 +52,40 @@ export class LoginPage extends Adw.Bin {
      * Show error message
      */
     public showError(message: string): void {
-        if (this.errorLabel) {
-            this.errorLabel.set_text(message);
-            this.errorLabel.visible = true;
-            this.errorLabel.add_css_class("error");
-        }
+        this._errorLabel.set_text(message);
+        this._errorLabel.visible = true;
+        this._errorLabel.add_css_class("error");
 
         // Add error styling to the entry
-        if (this.phoneEntry) {
-            this.phoneEntry.add_css_class("error");
-        }
+        this._phoneEntry.add_css_class("error");
 
-        logger.warn(`Login validation error: ${message} (instance: ${this.instanceId})`);
+        logger.warn(`Login validation error: ${message}`);
     }
 
     /**
      * Clear error message
      */
     public clearError(): void {
-        if (this.errorLabel) {
-            this.errorLabel.set_text("");
-            this.errorLabel.visible = false;
-            this.errorLabel.remove_css_class("error");
-        }
+        this._errorLabel.set_text("");
+        this._errorLabel.visible = false;
+        this._errorLabel.remove_css_class("error");
 
         // Remove error styling from the entry
-        if (this.phoneEntry) {
-            this.phoneEntry.remove_css_class("error");
-        }
+        this._phoneEntry.remove_css_class("error");
     }
 
     /**
      * Get the phone number from the input field
      */
     public getPhoneNumber(): string {
-        logger.debug(
-            `getPhoneNumber called (instance: ${this.instanceId}), phoneEntry: ${this.phoneEntry ? "exists" : "null"}`,
-        );
-        if (this.phoneEntry) {
-            const text = this.phoneEntry.get_text().trim();
-            logger.debug(
-                `Getting phone number from entry: "${text}" (instance: ${this.instanceId})`,
-            );
-            return text;
-        }
-        logger.debug(
-            `Phone entry not found, returning empty string (instance: ${this.instanceId})`,
-        );
-        return "";
-    }
-
-    /**
-     * Set the phone number in the input field
-     */
-    public setPhoneNumber(phoneNumber: string): void {
-        if (this.phoneEntry) {
-            this.phoneEntry.set_text(phoneNumber);
-        }
+        return this._phoneEntry.get_text().trim();
     }
 
     /**
      * Clear the input field
      */
     public clear(): void {
-        if (this.phoneEntry) {
-            this.phoneEntry.set_text("");
-        }
+        this._phoneEntry.set_text("");
         this.clearError();
     }
 
@@ -192,17 +93,13 @@ export class LoginPage extends Adw.Bin {
      * Focus the phone number input
      */
     public focus(): void {
-        if (this.phoneEntry) {
-            this.phoneEntry.grab_focus();
-        }
+        this._phoneEntry.grab_focus();
     }
 
     /**
      * Enable/disable the input field
      */
     public setEnabled(enabled: boolean): void {
-        if (this.phoneEntry) {
-            this.phoneEntry.sensitive = enabled;
-        }
+        this._phoneEntry.sensitive = enabled;
     }
 }

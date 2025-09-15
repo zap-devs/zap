@@ -1,16 +1,16 @@
-# Zap - Modern GTK WhatsApp-Style Chat Application
+# Zap - WhatsApp Client for GNOME
 
-A beautiful, modern chat application built with GTK 4 and libadwaita, designed to provide a WhatsApp-style messaging experience on the GNOME desktop.
+A WhatsApp client for the GNOME desktop, built with GTK 4 and libadwaita to provide a native messaging experience that integrates seamlessly with your desktop environment.
 
 > [!IMPORTANT]
 > This project is not affiliated with, endorsed by, or associated with WhatsApp, Meta Platforms Inc., or any of their subsidiaries. This is an independent open-source project inspired by modern chat application design patterns.
 
-![Zap Screenshot](data/screenshots/screenshot-1.png)
+![Zap Screenshot](data/screenshots/screenshot-2.png)
 
 ## Features
 
 - **Modern GTK 4 Interface**: Built with the latest GTK 4 and libadwaita for a native GNOME experience
-- **WhatsApp-Style Design**: Familiar chat interface with modern design patterns
+- **Native WhatsApp Experience**: Familiar chat interface with WhatsApp functionality
 - **Multi-Platform**: Distributed via Flatpak for easy installation across Linux distributions
 - **TypeScript Development**: Type-safe development with TypeScript and proper type definitions
 - **Responsive Layout**: Adaptive interface that works well on different screen sizes

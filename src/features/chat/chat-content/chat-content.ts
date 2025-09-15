@@ -8,6 +8,7 @@ export class ChatContent extends Adw.Bin {
     protected declare _messageContainer: Gtk.Box;
     protected declare _messageEntry: Gtk.Entry;
     protected declare _sendButton: Gtk.Button;
+
     private messages: Message[] = [];
     private currentChatId: number | null = null;
 

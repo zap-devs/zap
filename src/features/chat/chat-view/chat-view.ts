@@ -9,13 +9,16 @@ import { ChatListItem } from "../chat-list-item/chat-list-item.js";
 import { ChatWelcome } from "../chat-welcome/chat-welcome.js";
 
 export class ChatView extends Adw.Bin {
+    protected declare _listBox: Gtk.ListBox;
+    protected declare _welcomeContainer: Gtk.Box;
+    protected declare _split_view: Adw.NavigationSplitView;
+    protected declare _userNameLabel: GtkTypes.Label;
+    protected declare _chatContent: ChatContent;
+
     private chats: Chat[] = [];
     private messages: Message[] = [];
-    private listBox!: Gtk.ListBox;
-    private welcomeContainer!: Gtk.Box;
     private welcomeScreen!: ChatWelcome | null;
     private userName: string = "";
-    private userNameLabel!: GtkTypes.Label;
     private currentChatId: number | null = null;
 
     static {
@@ -24,7 +27,6 @@ export class ChatView extends Adw.Bin {
                 Template: "resource:///sh/alisson/Zap/ui/features/chat/chat-view/chat-view.ui",
                 InternalChildren: [
                     "listBox",
-                    "contentBox",
                     "welcomeContainer",
                     "split_view",
                     "userNameLabel",
@@ -38,21 +40,23 @@ export class ChatView extends Adw.Bin {
     public vfunc_constructed(): void {
         super.vfunc_constructed();
 
-        // Get the widgets from the template
-        this.listBox = this.get_template_child(ChatView.$gtype, "listBox") as GtkTypes.ListBox;
-        this.welcomeContainer = this.get_template_child(
-            ChatView.$gtype,
-            "welcomeContainer",
-        ) as Gtk.Box;
-        this.userNameLabel = this.get_template_child(
-            ChatView.$gtype,
-            "userNameLabel",
-        ) as Gtk.Label;
-
         logger.info("ChatView vfunc_constructed called");
 
         try {
-            // Initialize data using services
+            // Don't load data here - do it in realize when template children are available
+            logger.info("ChatView constructed successfully");
+        } catch (error) {
+            logger.error("Error during ChatView construction:", error);
+        }
+    }
+
+    public vfunc_realize(): void {
+        super.vfunc_realize();
+
+        logger.info("ChatView vfunc_realize called - template children should now be available");
+
+        try {
+            // Initialize data using services (template children are now available)
             this.loadDataFromService();
 
             // Initialize the list model for chats
@@ -64,9 +68,9 @@ export class ChatView extends Adw.Bin {
             // Setup navigation handling for mobile view
             this.setupNavigationHandling();
 
-            logger.info("ChatView constructed successfully");
+            logger.info("ChatView realized successfully");
         } catch (error) {
-            logger.error("Error during ChatView construction:", error);
+            logger.error("Error during ChatView realization:", error);
         }
     }
 
@@ -127,8 +131,22 @@ export class ChatView extends Adw.Bin {
         try {
             logger.info(`Initializing chat list with ${this.chats.length} chats`);
 
+            // Check if list box is available
+            if (!this._listBox) {
+                logger.error(
+                    "List box is not available - template children may not be initialized yet",
+                );
+                return;
+            }
+
+            // Check if we have chats to display
+            if (!this.chats || this.chats.length === 0) {
+                logger.warn("No chats available to initialize list");
+                return;
+            }
+
             // Clear existing rows from list box
-            this.clearListBox(this.listBox);
+            this.clearListBox(this._listBox);
 
             // Create ChatListItem components for each chat
             const chats = this.chats; // Store reference to avoid closure issues
@@ -141,7 +159,7 @@ export class ChatView extends Adw.Bin {
 
                 // Store chat data and all necessary references in the closure
                 const chatData = chat; // Store the actual chat data
-                const welcomeContainer = this.welcomeContainer;
+                const welcomeContainer = this._welcomeContainer;
 
                 // Connect to row activation
                 chatItem.connect("activated", () => {
@@ -162,23 +180,17 @@ export class ChatView extends Adw.Bin {
                     this.loadMessagesForChat(chatData.id);
 
                     // Handle navigation for mobile view (collapsed split view)
-                    // CRITICAL: Retrieve splitView fresh to avoid context loss in action callbacks
-                    const splitView = this.get_template_child(
-                        ChatView.$gtype,
-                        "split_view",
-                    ) as Adw.NavigationSplitView;
-
-                    if (splitView?.collapsed) {
+                    if (this._split_view?.collapsed) {
                         logger.info("Mobile view detected - navigating to content page");
                         // In collapsed mode, show the content page (libadwaita provides back button automatically)
-                        splitView.show_content = true;
+                        this._split_view.show_content = true;
                     }
 
                     logger.info(`Chat selected and messages loaded: ${chatData.name}`);
                 });
 
                 // Add to list box
-                this.listBox.append(chatItem);
+                this._listBox.append(chatItem);
             }
 
             logger.info("Chat list initialized successfully");
@@ -240,41 +252,17 @@ export class ChatView extends Adw.Bin {
             // Hide welcome screen and show chat content
             logger.info("Showing chat content, hiding welcome screen");
 
-            // Hide welcome screen
-            const welcomeContainer = this.get_template_child(
-                ChatView.$gtype,
-                "welcomeContainer",
-            ) as Gtk.Box;
-            if (welcomeContainer) {
-                welcomeContainer.visible = false;
-                logger.info("Hidden welcome container");
-            }
+            this._welcomeContainer.visible = false;
+            logger.info("Hidden welcome container");
 
-            // Show and load chat content
-            const chatContent = this.get_template_child(
-                ChatView.$gtype,
-                "chatContent",
-            ) as ChatContent;
-
-            if (chatContent) {
-                chatContent.visible = true;
-                chatContent.loadMessages(chatId, this.messages);
-                logger.info("Chat content loaded and shown");
-            } else {
-                logger.error("ChatContent is null");
-            }
+            this._chatContent.visible = true;
+            this._chatContent.loadMessages(chatId, this.messages);
+            logger.info("Chat content loaded and shown");
         } catch (error) {
             logger.error(`Error loading messages for chat ${chatId}:`, error);
             this.messages = [];
 
-            // Try to retrieve ChatContent fresh for clearing messages
-            const chatContent = this.get_template_child(
-                ChatView.$gtype,
-                "chatContent",
-            ) as ChatContent;
-            if (chatContent) {
-                chatContent.clearMessages();
-            }
+            this._chatContent.clearMessages();
         }
     }
 
@@ -285,47 +273,35 @@ export class ChatView extends Adw.Bin {
         this.setUserName("Chat");
         logger.info("Reset userNameLabel to 'Chat' for welcome screen");
 
-        // Retrieve ChatContent fresh to avoid context loss
-        const chatContent = this.get_template_child(ChatView.$gtype, "chatContent") as ChatContent;
-        logger.info(`ChatContent retrieved: ${!!chatContent}`);
-
-        // Hide chat content
-        if (chatContent) {
-            chatContent.visible = false;
-            logger.info("Hidden chat content");
-        }
+        // Check if chat content is available before trying to access it
+        this._chatContent.visible = false;
+        logger.info("Hidden chat content");
 
         // Show welcome screen
-        if (this.welcomeContainer) {
-            logger.info("Setting up welcome screen");
+        logger.info("Setting up welcome screen");
 
-            // Create and show the welcome screen
-            if (!this.welcomeScreen) {
-                this.welcomeScreen = new ChatWelcome();
-                logger.info("Created new ChatWelcome instance");
-            }
-
-            // Remove any existing children from the welcome container
-            let child = this.welcomeContainer.get_first_child();
-            while (child) {
-                const next = child.get_next_sibling();
-                this.welcomeContainer.remove(child);
-                child = next;
-            }
-
-            this.welcomeContainer.append(this.welcomeScreen);
-            this.welcomeContainer.visible = true;
-            logger.info("Welcome screen shown successfully");
-        } else {
-            logger.error("welcomeContainer is null - cannot show welcome screen");
+        // Create and show the welcome screen
+        if (!this.welcomeScreen) {
+            this.welcomeScreen = new ChatWelcome();
+            logger.info("Created new ChatWelcome instance");
         }
+
+        // Remove any existing children from the welcome container
+        let child = this._welcomeContainer.get_first_child();
+        while (child) {
+            const next = child.get_next_sibling();
+            this._welcomeContainer.remove(child);
+            child = next;
+        }
+
+        this._welcomeContainer.append(this.welcomeScreen);
+        this._welcomeContainer.visible = true;
+        logger.info("Welcome screen shown successfully");
     }
 
     public setUserName(userName: string): void {
         this.userName = userName;
-        if (this.userNameLabel) {
-            this.userNameLabel.set_label(userName);
-        }
+        this._userNameLabel.set_label(userName);
     }
 
     public getUserName(): string {
@@ -339,20 +315,17 @@ export class ChatView extends Adw.Bin {
         try {
             logger.info("Setting up navigation handling");
 
-            // CRITICAL: Retrieve splitView fresh to avoid context loss
-            const splitView = this.get_template_child(
-                ChatView.$gtype,
-                "split_view",
-            ) as Adw.NavigationSplitView;
-
-            if (!splitView) {
-                logger.error("Split view not found in setupNavigationHandling");
+            // Check if split view is available before trying to connect to it
+            if (!this._split_view) {
+                logger.warn(
+                    "Split view is not available yet - navigation handling will be set up later",
+                );
                 return;
             }
 
             // Connect to split view collapsed state changes
-            splitView.connect("notify::collapsed", () => {
-                logger.info(`Split view collapsed state changed: ${splitView.collapsed}`);
+            this._split_view.connect("notify::collapsed", () => {
+                logger.info(`Split view collapsed state changed: ${this._split_view.collapsed}`);
             });
 
             logger.info("Navigation handling setup completed");

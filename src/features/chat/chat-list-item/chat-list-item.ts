@@ -5,6 +5,10 @@ import { logger } from "../../../core/logger.js";
 import type { Chat } from "../../../shared/models/chat.model.js";
 
 export class ChatListItem extends Adw.ActionRow {
+    protected declare _chatAvatar: Adw.Avatar;
+    protected declare _unreadBadge: Gtk.Label;
+    protected declare _timestampLabel: Gtk.Label;
+
     private chatData: Chat | null = null;
 
     static {
@@ -12,7 +16,7 @@ export class ChatListItem extends Adw.ActionRow {
             {
                 Template:
                     "resource:///sh/alisson/Zap/ui/features/chat/chat-list-item/chat-list-item.ui",
-                InternalChildren: ["chatAvatar", "chatMetaBox", "unreadBadge", "timestampLabel"],
+                InternalChildren: ["chatAvatar", "unreadBadge", "timestampLabel"],
             },
             ChatListItem,
         );
@@ -29,20 +33,6 @@ export class ChatListItem extends Adw.ActionRow {
     public setChatData(chat: Chat): void {
         this.chatData = chat;
 
-        // CRITICAL FIX: Retrieve template children fresh to avoid context loss
-        const chatAvatar = this.get_template_child(
-            ChatListItem.$gtype,
-            "chatAvatar",
-        ) as Adw.Avatar;
-        const timestampLabel = this.get_template_child(
-            ChatListItem.$gtype,
-            "timestampLabel",
-        ) as Gtk.Label;
-        const unreadBadge = this.get_template_child(
-            ChatListItem.$gtype,
-            "unreadBadge",
-        ) as Gtk.Label;
-
         logger.debug(
             `[ChatListItem] Setting chat data for ${chat.name}, unread: ${chat.unreadCount}, time: ${chat.timestamp}`,
         );
@@ -52,33 +42,19 @@ export class ChatListItem extends Adw.ActionRow {
         this.subtitle = chat.lastMessage;
 
         // Set avatar
-        if (chatAvatar) {
-            chatAvatar.text = chat.name;
-            logger.debug(`[ChatListItem] Avatar text set to: ${chat.name}`);
-        } else {
-            logger.error("[ChatListItem] chatAvatar is undefined in setChatData");
-        }
+        this._chatAvatar.text = chat.name;
 
         // Set timestamp
-        if (timestampLabel) {
-            timestampLabel.label = chat.timestamp;
-            logger.debug(`[ChatListItem] Timestamp label set to: ${chat.timestamp}`);
-        } else {
-            logger.error("[ChatListItem] timestampLabel is undefined in setChatData");
-        }
+        this._timestampLabel.label = chat.timestamp;
 
         // Show/hide unread badge
-        if (unreadBadge) {
-            if (chat.unreadCount > 0) {
-                unreadBadge.visible = true;
-                unreadBadge.label = chat.unreadCount.toString();
-                logger.debug(`[ChatListItem] Unread badge shown with count: ${chat.unreadCount}`);
-            } else {
-                unreadBadge.visible = false;
-                logger.debug("[ChatListItem] Unread badge hidden");
-            }
+        if (chat.unreadCount > 0) {
+            this._unreadBadge.visible = true;
+            this._unreadBadge.label = chat.unreadCount.toString();
+            logger.debug(`[ChatListItem] Unread badge shown with count: ${chat.unreadCount}`);
         } else {
-            logger.error("[ChatListItem] unreadBadge is undefined in setChatData");
+            this._unreadBadge.visible = false;
+            logger.debug("[ChatListItem] Unread badge hidden");
         }
     }
 
@@ -96,21 +72,11 @@ export class ChatListItem extends Adw.ActionRow {
         if (this.chatData) {
             this.chatData.unreadCount = count;
 
-            // CRITICAL FIX: Retrieve template children fresh to avoid context loss
-            const unreadBadge = this.get_template_child(
-                ChatListItem.$gtype,
-                "unreadBadge",
-            ) as Gtk.Label;
-
-            if (unreadBadge) {
-                if (count > 0) {
-                    unreadBadge.visible = true;
-                    unreadBadge.label = count.toString();
-                } else {
-                    unreadBadge.visible = false;
-                }
+            if (count > 0) {
+                this._unreadBadge.visible = true;
+                this._unreadBadge.label = count.toString();
             } else {
-                logger.error("[ChatListItem] unreadBadge is undefined in updateUnreadCount");
+                this._unreadBadge.visible = false;
             }
         }
     }
@@ -125,17 +91,7 @@ export class ChatListItem extends Adw.ActionRow {
 
             this.subtitle = message;
 
-            // CRITICAL FIX: Retrieve template children fresh to avoid context loss
-            const timestampLabel = this.get_template_child(
-                ChatListItem.$gtype,
-                "timestampLabel",
-            ) as Gtk.Label;
-
-            if (timestampLabel) {
-                timestampLabel.label = timestamp;
-            } else {
-                logger.error("[ChatListItem] timestampLabel is undefined in updateLastMessage");
-            }
+            this._timestampLabel.label = timestamp;
         }
     }
 }

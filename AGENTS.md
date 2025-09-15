@@ -206,6 +206,38 @@ import Gtk from "gi://Gtk?version=4.0";
 
 ## Code Style and Conventions
 
+### Git Commit Messages
+This project follows the [Conventional Commits specification](https://www.conventionalcommits.org/). Commit messages should be structured as:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+**Types:**
+- `feat`: A new feature
+- `fix`: A bug fix
+- `docs`: Documentation only changes
+- `style`: Changes that do not affect the meaning of the code
+- `refactor`: A code change that neither fixes a bug nor adds a feature
+- `perf`: A code change that improves performance
+- `test`: Adding missing tests or correcting existing tests
+- `build`: Changes that affect the build system or external dependencies
+- `ci`: Changes to CI configuration files and scripts
+- `chore`: Other changes that don't modify src or test files
+
+**Examples:**
+```bash
+feat: add phone number validation to login form
+fix: resolve blueprint template loading issue
+docs: update README with new build instructions
+style: format TypeScript files with biome
+refactor: simplify chat service message handling
+```
+
 ### TypeScript
 - Use strict TypeScript configuration with explicit types
 - Import both type and runtime versions of GTK modules
@@ -252,7 +284,7 @@ import Gtk from "gi://Gtk?version=4.0";
 - `src/shared/utils/formatting.ts` - Text and data formatting utilities
 
 ### Resources and Configuration
-- `src/resources/sh.alisson.Zap.src.gresource.xml` - Resource definitions
+- `src/sh.alisson.Zap.src.gresource.xml` - Resource definitions
 - `src/resources/styles/global.css` - Global CSS styles using libadwaita variables
 - `src/resources/help-overlay.blp` - Keyboard shortcuts help overlay
 - `src/**/*.blp` - Blueprint UI definitions throughout the project
@@ -352,7 +384,7 @@ launcher.launch(this, null).catch(console.error);
 1. Create feature directory under `src/features/` (e.g., `src/features/my-feature/`)
 2. Create Blueprint file (`my-feature.blp`) and TypeScript controller (`my-feature.ts`)
 3. Add files to appropriate sections in `src/meson.build`
-4. Add UI resource path to `src/resources/sh.alisson.Zap.src.gresource.xml`
+4. Add UI resource path to `src/sh.alisson.Zap.src.gresource.xml`
 5. Register widget in main application startup (`src/main.ts`)
 6. Add navigation and window actions in `src/core/window/window.ts`
 
@@ -360,7 +392,7 @@ launcher.launch(this, null).catch(console.error);
 1. Create Blueprint file in appropriate feature directory (`src/features/[feature]/new-page.blp`)
 2. Create TypeScript controller (`src/features/[feature]/new-page.ts`)
 3. Add to `src/meson.build` sources list in appropriate section
-4. Add to `src/resources/sh.alisson.Zap.src.gresource.xml`
+4. Add to `src/sh.alisson.Zap.src.gresource.xml`
 5. Register in window's ViewStack in `src/core/window/window.ts`
 6. Add navigation action in window class
 

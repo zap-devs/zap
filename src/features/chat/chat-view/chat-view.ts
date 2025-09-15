@@ -130,14 +130,6 @@ export class ChatView extends Adw.Bin {
         try {
             logger.info(`Initializing chat list with ${this.chats.length} chats`);
 
-            // Check if list box is available
-            if (!this._listBox) {
-                logger.error(
-                    "List box is not available - template children may not be initialized yet",
-                );
-                return;
-            }
-
             // Check if we have chats to display
             if (!this.chats || this.chats.length === 0) {
                 logger.warn("No chats available to initialize list");
@@ -178,7 +170,7 @@ export class ChatView extends Adw.Bin {
                     this.loadMessagesForChat(chatData.id);
 
                     // Handle navigation for mobile view (collapsed split view)
-                    if (this._split_view?.collapsed) {
+                    if (this._split_view.collapsed) {
                         logger.info("Mobile view detected - navigating to content page");
                         // In collapsed mode, show the content page (libadwaita provides back button automatically)
                         this._split_view.show_content = true;
@@ -312,14 +304,6 @@ export class ChatView extends Adw.Bin {
     private setupNavigationHandling(): void {
         try {
             logger.info("Setting up navigation handling");
-
-            // Check if split view is available before trying to connect to it
-            if (!this._split_view) {
-                logger.warn(
-                    "Split view is not available yet - navigation handling will be set up later",
-                );
-                return;
-            }
 
             // Connect to split view collapsed state changes
             this._split_view.connect("notify::collapsed", () => {

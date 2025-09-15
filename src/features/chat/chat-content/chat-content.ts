@@ -80,11 +80,6 @@ export class ChatContent extends Adw.Bin {
                 return;
             }
 
-            if (!this._messageContainer) {
-                logger.error("Message container is null, cannot add message");
-                return;
-            }
-
             this.messages.push(message);
             const messageWidget = this.createMessageWidget(message);
             this._messageContainer.append(messageWidget);
@@ -111,11 +106,6 @@ export class ChatContent extends Adw.Bin {
         try {
             this.currentChatId = null;
             this.messages = [];
-
-            if (!this._messageContainer) {
-                logger.warn("Message container is null, skipping clear");
-                return;
-            }
 
             // Clear the message container
             let child = this._messageContainer.get_first_child();

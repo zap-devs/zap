@@ -26,7 +26,7 @@ import { logger } from "../logger.js";
  *  - https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.ApplicationWindow.html
  */
 export class Window extends Adw.ApplicationWindow {
-    private _stack!: Adw.ViewStack;
+    protected declare _stack: Adw.ViewStack;
 
     static {
         /**
@@ -114,19 +114,6 @@ export class Window extends Adw.ApplicationWindow {
     public vfunc_constructed(): void {
         // Call the parent class's vfunc_constructed method
         super.vfunc_constructed();
-
-        // Try to get the stack widget using get_template_child
-        this._stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
-        logger.debug(`Window constructed, stack initialized: ${this._stack ? "success" : "null"}`);
-
-        // Add a safety check - ensure the stack is properly initialized
-        if (!this._stack) {
-            logger.error("Stack is null after template child retrieval in vfunc_constructed");
-            return;
-        }
-
-        logger.debug(`Stack object stored: ${this._stack}`);
-        logger.debug(`Stack constructor: ${this._stack.constructor.name}`);
 
         // Action to show the login screen
         this.showLoginAction = new Gio.SimpleAction({

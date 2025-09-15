@@ -5,9 +5,9 @@ import { logger } from "../../../core/logger.js";
 import type { Message } from "../../../shared/models/chat.model.js";
 
 export class ChatContent extends Adw.Bin {
-    private messageContainer!: Gtk.Box;
-    private messageEntry!: Gtk.Entry;
-    private sendButton!: Gtk.Button;
+    protected declare _messageContainer: Gtk.Box;
+    protected declare _messageEntry: Gtk.Entry;
+    protected declare _sendButton: Gtk.Button;
     private messages: Message[] = [];
     private currentChatId: number | null = null;
 
@@ -22,54 +22,6 @@ export class ChatContent extends Adw.Bin {
         );
     }
 
-    public vfunc_constructed(): void {
-        super.vfunc_constructed();
-
-        // Get the widgets from the template
-        this.messageContainer = this.get_template_child(
-            ChatContent.$gtype,
-            "messageContainer",
-        ) as Gtk.Box;
-        this.messageEntry = this.get_template_child(
-            ChatContent.$gtype,
-            "messageEntry",
-        ) as Gtk.Entry;
-        this.sendButton = this.get_template_child(ChatContent.$gtype, "sendButton") as Gtk.Button;
-
-        logger.info("ChatContent constructed successfully");
-        logger.debug(`Message container: ${this.messageContainer}`);
-        logger.debug(`Message entry: ${this.messageEntry}`);
-        logger.debug(`Send button: ${this.sendButton}`);
-    }
-
-    /**
-     * Ensure template children are available - CRITICAL for GJS action callbacks
-     */
-    private ensureTemplateChildren(): void {
-        if (!this.messageContainer || !this.messageEntry || !this.sendButton) {
-            logger.warn("Template children not available, forcing retrieval");
-
-            try {
-                this.messageContainer = this.get_template_child(
-                    ChatContent.$gtype,
-                    "messageContainer",
-                ) as Gtk.Box;
-                this.messageEntry = this.get_template_child(
-                    ChatContent.$gtype,
-                    "messageEntry",
-                ) as Gtk.Entry;
-                this.sendButton = this.get_template_child(
-                    ChatContent.$gtype,
-                    "sendButton",
-                ) as Gtk.Button;
-
-                logger.info("Template children retrieved successfully");
-            } catch (error) {
-                logger.error("Failed to retrieve template children:", error);
-            }
-        }
-    }
-
     /**
      * Load and display messages for a specific chat
      */
@@ -77,28 +29,14 @@ export class ChatContent extends Adw.Bin {
         try {
             logger.info(`Loading ${messages.length} messages for chat ${chatId}`);
 
-            // CRITICAL: Ensure template children are available
-            this.ensureTemplateChildren();
-
-            logger.debug(`Message container exists: ${!!this.messageContainer}`);
-            logger.debug(`Message container visible: ${this.messageContainer?.visible}`);
-            logger.debug(
-                `Message container children count: ${this.messageContainer?.get_first_child() ? "has children" : "no children"}`,
-            );
-
-            if (!this.messageContainer) {
-                logger.error("Message container is still null after ensuring template children");
-                return;
-            }
-
             this.currentChatId = chatId;
             this.messages = messages;
 
             // Clear the message container
-            let child = this.messageContainer.get_first_child();
+            let child = this._messageContainer.get_first_child();
             while (child) {
                 const next = child.get_next_sibling();
-                this.messageContainer.remove(child);
+                this._messageContainer.remove(child);
                 child = next;
             }
 
@@ -107,12 +45,12 @@ export class ChatContent extends Adw.Bin {
             for (const message of messages) {
                 logger.debug(`Creating widget for message: ${message.text}`);
                 const messageWidget = this.createMessageWidget(message);
-                this.messageContainer.append(messageWidget);
+                this._messageContainer.append(messageWidget);
                 logger.debug(`Message widget appended to container`);
             }
 
             // Scroll to bottom
-            const scrolledWindow = this.messageContainer.get_parent() as Gtk.ScrolledWindow;
+            const scrolledWindow = this._messageContainer.get_parent() as Gtk.ScrolledWindow;
             if (scrolledWindow) {
                 const vadjustment = scrolledWindow.get_vadjustment();
                 if (vadjustment) {
@@ -141,20 +79,17 @@ export class ChatContent extends Adw.Bin {
                 return;
             }
 
-            // CRITICAL: Ensure template children are available
-            this.ensureTemplateChildren();
-
-            if (!this.messageContainer) {
+            if (!this._messageContainer) {
                 logger.error("Message container is null, cannot add message");
                 return;
             }
 
             this.messages.push(message);
             const messageWidget = this.createMessageWidget(message);
-            this.messageContainer.append(messageWidget);
+            this._messageContainer.append(messageWidget);
 
             // Scroll to bottom
-            const scrolledWindow = this.messageContainer.get_parent() as Gtk.ScrolledWindow;
+            const scrolledWindow = this._messageContainer.get_parent() as Gtk.ScrolledWindow;
             if (scrolledWindow) {
                 const vadjustment = scrolledWindow.get_vadjustment();
                 if (vadjustment) {
@@ -176,19 +111,16 @@ export class ChatContent extends Adw.Bin {
             this.currentChatId = null;
             this.messages = [];
 
-            // CRITICAL: Ensure template children are available
-            this.ensureTemplateChildren();
-
-            if (!this.messageContainer) {
+            if (!this._messageContainer) {
                 logger.warn("Message container is null, skipping clear");
                 return;
             }
 
             // Clear the message container
-            let child = this.messageContainer.get_first_child();
+            let child = this._messageContainer.get_first_child();
             while (child) {
                 const next = child.get_next_sibling();
-                this.messageContainer.remove(child);
+                this._messageContainer.remove(child);
                 child = next;
             }
 
@@ -202,9 +134,7 @@ export class ChatContent extends Adw.Bin {
      * Get the message entry widget
      */
     public getMessageEntry(): Gtk.Entry {
-        // CRITICAL: Ensure template children are available
-        this.ensureTemplateChildren();
-        return this.messageEntry;
+        return this._messageEntry;
     }
 
     /**

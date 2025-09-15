@@ -19,7 +19,6 @@ export class ChatView extends Adw.Bin {
     private messages: Message[] = [];
     private welcomeScreen!: ChatWelcome | null;
     private userName: string = "";
-    private currentChatId: number | null = null;
 
     static {
         GObject.registerClass(
@@ -176,7 +175,6 @@ export class ChatView extends Adw.Bin {
                     }
 
                     // Load and display messages for this chat
-                    this.currentChatId = chatData.id;
                     this.loadMessagesForChat(chatData.id);
 
                     // Handle navigation for mobile view (collapsed split view)
@@ -337,7 +335,7 @@ export class ChatView extends Adw.Bin {
     /**
      * Helper method to clear a ListBox
      */
-    private clearListBox(listBox: any): void {
+    private clearListBox(listBox: Gtk.ListBox): void {
         if (!listBox) return;
 
         let child = listBox.get_first_child();

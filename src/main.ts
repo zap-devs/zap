@@ -31,7 +31,6 @@ import { ChatView } from "./features/chat/chat-view/chat-view.js";
 export class Application extends Adw.Application {
     private window?: Window;
     private cssLoaded: boolean = false;
-    private currentUserName: string = "";
 
     /**
      * When subclassing a GObject, we need to register the class with the
@@ -125,7 +124,7 @@ export class Application extends Adw.Application {
         const cssProvider = new Gtk.CssProvider();
         cssProvider.load_from_resource("/sh/alisson/Zap/css/resources/styles/global.css");
         Gtk.StyleContext.add_provider_for_display(
-            Gdk.Display.get_default()!,
+            Gdk.Display.get_default(),
             cssProvider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
         );
@@ -143,18 +142,6 @@ export class Application extends Adw.Application {
         this.loadCss();
 
         this.window.present();
-    }
-
-    public getCurrentUserName(): string {
-        return this.currentUserName;
-    }
-
-    public setCurrentUserName(userName: string): void {
-        this.currentUserName = userName;
-        // Update the window title if it's available
-        if (this.window) {
-            this.window.set_title(`${userName} - Zap`);
-        }
     }
 }
 

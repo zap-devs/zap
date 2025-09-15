@@ -209,7 +209,6 @@ import Gtk from "gi://Gtk?version=4.0";
 ### TypeScript
 - Use strict TypeScript configuration with explicit types
 - Import both type and runtime versions of GTK modules
-- Use `!` for template children that GJS will inject
 - Prefer explicit typing over `any`
 - Use `void` for functions that don't return values
 

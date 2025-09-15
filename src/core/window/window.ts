@@ -151,12 +151,6 @@ export class Window extends Adw.ApplicationWindow {
         this.logoutAction.connect("activate", () => {
             logger.info("Logout action triggered");
 
-            // Get the app and trigger logout
-            const app = this.get_application();
-            if (app && "setCurrentUserName" in app) {
-                (app as any).setCurrentUserName(null);
-            }
-
             // Navigate to login screen
             this._stack.visible_child_name = "login";
         });

@@ -277,7 +277,7 @@ export function formatDisplayName(
                     formatted = formatted.substring(0, maxLength);
                 }
             } else {
-                formatted = formatted.substring(0, maxLength - 3) + "...";
+                formatted = `${formatted.substring(0, maxLength - 3)}...`;
             }
         }
 
@@ -359,7 +359,7 @@ export function truncateText(
         return truncated + ellipsis;
     } catch (error) {
         logger.error("Text truncation error:", error);
-        return text.substring(0, maxLength) + "...";
+        return `${text.substring(0, maxLength)}...`;
     }
 }
 

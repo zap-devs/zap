@@ -23,9 +23,6 @@ typescript_sources = files(
   'shared/utils/constants.ts',
   'shared/utils/formatting.ts',
   'shared/utils/validation.ts',
-
-  # Type definitions
-  'types/app.types.ts',
 )
 
 # Define all Blueprint files with their new paths

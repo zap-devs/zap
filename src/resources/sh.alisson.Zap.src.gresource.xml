@@ -22,9 +22,6 @@
     <file>shared/utils/constants.js</file>
     <file>shared/utils/formatting.js</file>
     <file>shared/utils/validation.js</file>
-
-    <!-- Type definitions -->
-    <file>types/app.types.js</file>
   </gresource>
   <gresource prefix="/sh/alisson/Zap/ui">
     <!-- UI files -->

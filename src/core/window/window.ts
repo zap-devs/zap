@@ -123,18 +123,12 @@ export class Window extends Adw.ApplicationWindow {
         this.showLoginAction.connect("activate", () => {
             logger.debug("show-login action triggered");
             try {
-                // Try to get the stack directly from the window using get_template_child
-                const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
-                logger.debug(`Stack retrieved in action: ${stack}`);
-                logger.debug(`Stack type in action: ${stack?.constructor.name}`);
+                logger.debug(`Stack retrieved in action: ${this._stack}`);
+                logger.debug(`Stack type in action: ${this._stack?.constructor.name}`);
 
-                if (stack) {
-                    logger.debug(`Current stack page: ${stack.visible_child_name}`);
-                    stack.visible_child_name = "login";
-                    logger.debug(`Stack page changed to: ${stack.visible_child_name}`);
-                } else {
-                    logger.error("Could not retrieve stack in show-login action");
-                }
+                logger.debug(`Current stack page: ${this._stack.visible_child_name}`);
+                this._stack.visible_child_name = "login";
+                logger.debug(`Stack page changed to: ${this._stack.visible_child_name}`);
             } catch (error) {
                 logger.error("Error in show-login action:", error);
             }
@@ -164,10 +158,7 @@ export class Window extends Adw.ApplicationWindow {
             }
 
             // Navigate to login screen
-            const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
-            if (stack) {
-                stack.visible_child_name = "login";
-            }
+            this._stack.visible_child_name = "login";
         });
 
         // Action to show settings
@@ -217,28 +208,21 @@ export class Window extends Adw.ApplicationWindow {
         try {
             logger.info("Login action triggered");
 
-            // Get the stack fresh each time to avoid context issues
-            const stack = this.get_template_child(Window.$gtype, "stack") as Adw.ViewStack;
-            if (!stack) {
-                logger.error("Could not retrieve stack in handleLogin");
-                return;
-            }
-
-            logger.debug(`Stack retrieved in handleLogin: ${stack}`);
-            logger.debug(`Stack type in handleLogin: ${stack.constructor.name}`);
+            logger.debug(`Stack retrieved in handleLogin: ${this._stack}`);
+            logger.debug(`Stack type in handleLogin: ${this._stack.constructor.name}`);
 
             // Get the currently visible child - this should be the LoginPage
-            const loginPage = stack.visible_child;
+            const loginPage = this._stack.visible_child;
             logger.debug(`Currently visible child: ${loginPage?.constructor.name}`);
 
             if (!(loginPage instanceof LoginPage)) {
                 logger.error(`Visible child is not a LoginPage: ${loginPage?.constructor.name}`);
 
                 // Fallback: try to get by name if not currently visible
-                const fallbackLoginPage = stack.get_child_by_name("login");
+                const fallbackLoginPage = this._stack.get_child_by_name("login");
                 if (fallbackLoginPage instanceof LoginPage) {
                     logger.debug("Using fallback login page found by name");
-                    this.handleLoginPage(fallbackLoginPage, stack);
+                    this.handleLoginPage(fallbackLoginPage, this._stack);
                 } else {
                     logger.error("Could not find LoginPage instance");
                 }
@@ -246,7 +230,7 @@ export class Window extends Adw.ApplicationWindow {
             }
 
             logger.debug(`Found LoginPage instance: ${loginPage.constructor.name}`);
-            this.handleLoginPage(loginPage, stack);
+            this.handleLoginPage(loginPage, this._stack);
         } catch (error) {
             logger.error("Login process failed:", error);
         }

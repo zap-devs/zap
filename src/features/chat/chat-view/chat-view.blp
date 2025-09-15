@@ -2,187 +2,69 @@ using Gtk 4.0;
 using Adw 1;
 
 template $Gjs_ChatView: Adw.Bin {
-  // Mobile navigation components (accessible from template)
-  Adw.NavigationView navigation_view {
-    vexpand: true;
-
-    Adw.NavigationPage chat_list_page {
-      title: _("Chats");
-      tag: "chat_list";
-
-      child: Adw.ToolbarView {
-        [top]
-        Adw.HeaderBar {
-          show-title: true;
-
-          [title]
-          Adw.WindowTitle {
-            title: "Chats";
-          }
-
-          [end]
-          MenuButton {
-            icon-name: "open-menu-symbolic";
-            tooltip-text: _("Main Menu");
-            menu-model: primary_menu;
-          }
-
-          styles [
-            "flat",
-          ]
-        }
-
-        content: Box {
-          orientation: vertical;
-
-          ScrolledWindow {
-            vexpand: true;
-            hscrollbar-policy: never;
-
-            child: ListBox listBox_mobile {
-              selection-mode: single;
-
-              styles [
-                "boxed-list",
-              ]
-            };
-          }
-        };
-      };
-    }
-
-    Adw.NavigationPage chat_content_page {
-      title: _("Chat");
-      tag: "chat_content_page";
-
-      child: Adw.ToolbarView {
-        [top]
-        Adw.HeaderBar {
-          show-title: true;
-
-          [start]
-          Button backButton {
-            icon-name: "go-previous-symbolic";
-            tooltip-text: _("Back to chats");
-          }
-
-          [title]
-          Adw.WindowTitle chatPageTitle {
-            title: _("Chat");
-          }
-
-          styles [
-            "flat",
-          ]
-        }
-
-        content: Box {
-          orientation: vertical;
-
-          Box mobileWelcomeContainer {
-            vexpand: true;
-            orientation: vertical;
-          }
-
-          $Gjs_ChatContent mobileChatContent {
-            vexpand: true;
-          }
-        };
-      };
-    }
-  }
-
-  child: Adw.BreakpointBin breakpoint_bin {
+  child: Adw.BreakpointBin {
     width-request: 360;
     height-request: 200;
 
-    Adw.Breakpoint breakpoint_narrow {
-      condition ("max-width: 600sp")
+    child: Adw.NavigationSplitView split_view {
+      min-sidebar-width: 200;
+      max-sidebar-width: 300;
+      sidebar-width-fraction: 0.3;
+      vexpand: true;
 
-      setters {
-        breakpoint_bin.child: navigation_view;
-      }
-    }
+      sidebar: Adw.NavigationPage sidebarPage {
+        title: _("Chats");
 
-    Adw.Breakpoint breakpoint_wide {
-      condition ("min-width: 601sp")
+        child: Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {
+            show-title: true;
 
-      setters {
-        breakpoint_bin.child: desktop_layout;
-      }
-    }
+            [title]
+            Adw.WindowTitle {
+              title: "Chats";
+            }
 
-    child: desktop_layout;
-  };
-}
+            [end]
+            MenuButton {
+              icon-name: "open-menu-symbolic";
+              tooltip-text: _("Main Menu");
+              menu-model: primary_menu;
+            }
 
-// Desktop layout with split view
-Box desktop_layout {
-  orientation: vertical;
-
-  Adw.NavigationSplitView split_view {
-    min-sidebar-width: 200;
-    max-sidebar-width: 300;
-    sidebar-width-fraction: 0.3;
-    vexpand: true;
-
-    sidebar: Adw.NavigationPage {
-      title: _("Chats");
-
-      child: Adw.ToolbarView {
-        [top]
-        Adw.HeaderBar {
-          show-title: true;
-
-          [title]
-          Adw.WindowTitle {
-            title: "Chats";
+            styles [
+              "flat",
+            ]
           }
 
-          [end]
-          MenuButton {
-            icon-name: "open-menu-symbolic";
-            tooltip-text: _("Main Menu");
-            menu-model: primary_menu;
-          }
+          content: Box {
+            orientation: vertical;
 
-          styles [
-            "flat",
-          ]
-        }
+            ScrolledWindow {
+              vexpand: true;
+              hscrollbar-policy: never;
 
-        content: Box {
-          orientation: vertical;
+              child: ListBox listBox {
+                selection-mode: single;
 
-          ScrolledWindow {
-            vexpand: true;
-            hscrollbar-policy: never;
-
-            child: ListBox listBox {
-              selection-mode: single;
-
-              styles [
-                "boxed-list",
-              ]
-            };
-          }
+                styles [
+                  "boxed-list",
+                ]
+              };
+            }
+          };
         };
       };
-    };
 
-    content: Adw.NavigationPage {
-      title: _("Chat");
+      content: Adw.NavigationPage contentPage {
+        title: _("Chat");
 
-      child: Adw.ToolbarView {
-        [top]
-        Adw.HeaderBar {
-          show-title: false;
+        child: Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {
+            show-title: false;
 
-          Box {
-            orientation: horizontal;
-            spacing: 6;
-            halign: center;
-
+            [title]
             Label userNameLabel {
               label: _("Chat");
 
@@ -191,33 +73,36 @@ Box desktop_layout {
               ]
             }
           }
-        }
 
-        content: Box {
-          orientation: vertical;
-
-          Box contentBox {
-            vexpand: true;
+          content: Box {
             orientation: vertical;
 
-            Box welcomeContainer {
+            Box contentBox {
               vexpand: true;
               orientation: vertical;
-            }
 
-            $Gjs_ChatContent chatContent {
-              vexpand: true;
+              Box welcomeContainer {
+                vexpand: true;
+                orientation: vertical;
+              }
+
+              $Gjs_ChatContent chatContent {
+                vexpand: true;
+              }
             }
-          }
+          };
         };
       };
     };
-  }
-}
 
-// Mobile layout wrapper (empty - navigation view is at top level)
-Box mobile_layout {
-  orientation: vertical;
+    Adw.Breakpoint {
+      condition ("max-width: 800sp")
+
+      setters {
+        split_view.collapsed: true;
+      }
+    }
+  };
 }
 
 menu primary_menu {

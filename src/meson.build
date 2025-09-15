@@ -16,12 +16,9 @@ typescript_sources = files(
   'features/chat/chat-list-item/chat-list-item.ts',
 
   # Shared files
-  'shared/index.ts',
   'shared/models/chat.model.ts',
   'shared/services/chat-service.ts',
   'shared/services/user-service.ts',
-  'shared/utils/constants.ts',
-  'shared/utils/formatting.ts',
   'shared/utils/validation.ts',
 )
 
@@ -62,7 +59,7 @@ blueprints = custom_target('blueprints',
 
 src_res = gnome.compile_resources(
   'sh.alisson.Zap.src',
-  'resources/sh.alisson.Zap.src.gresource.xml',
+  'sh.alisson.Zap.src.gresource.xml',
   dependencies: [typescript, blueprints],
   source_dir: tsc_out,
   gresource_bundle: true,

@@ -15,12 +15,9 @@
     <file>features/chat/chat-list-item/chat-list-item.js</file>
 
     <!-- Shared files -->
-    <file>shared/index.js</file>
     <file>shared/models/chat.model.js</file>
     <file>shared/services/chat-service.js</file>
     <file>shared/services/user-service.js</file>
-    <file>shared/utils/constants.js</file>
-    <file>shared/utils/formatting.js</file>
     <file>shared/utils/validation.js</file>
   </gresource>
   <gresource prefix="/sh/alisson/Zap/ui">

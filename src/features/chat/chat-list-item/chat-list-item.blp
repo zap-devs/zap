@@ -20,35 +20,29 @@ template $Gjs_ChatListItem: Adw.ActionRow {
 
   [suffix]
   Box {
-    orientation: horizontal;
+    orientation: vertical;
     spacing: 6;
-    valign: center;
 
     Box {
-      orientation: vertical;
-      spacing: 6;
+      halign: end;
+      // Unread badge (will be shown/hidden dynamically)
+      Label unreadBadge {
+        visible: false;
 
-      Box {
-        halign: end;
-        // Unread badge (will be shown/hidden dynamically)
-        Label unreadBadge {
-          visible: false;
-
-          styles [
-            "badge",
-            "unread-badge",
-          ]
-        }
-      }
-
-      // Timestamp
-      Label timestampLabel {
         styles [
-          "caption",
-          "dim-label",
-          "chat-timestamp",
+          "badge",
+          "unread-badge",
         ]
       }
+    }
+
+    // Timestamp
+    Label timestampLabel {
+      styles [
+        "caption",
+        "dim-label",
+        "chat-timestamp",
+      ]
     }
   }
 }

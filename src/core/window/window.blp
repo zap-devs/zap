@@ -9,32 +9,28 @@ template $Gjs_Window: Adw.ApplicationWindow {
   resizable: true;
   title: _("Zap");
 
-  content: Box {
-    orientation: vertical;
+  content: Adw.ViewStack stack {
+    vexpand: true;
 
-    Adw.ViewStack stack {
-      vexpand: true;
+    Adw.ViewStackPage {
+      name: "welcome";
+      title: _("Welcome");
 
-      Adw.ViewStackPage {
-        name: "welcome";
-        title: _("Welcome");
+      child: $Gjs_WelcomePage {};
+    }
 
-        child: $Gjs_WelcomePage {};
-      }
+    Adw.ViewStackPage {
+      name: "login";
+      title: _("Login");
 
-      Adw.ViewStackPage {
-        name: "login";
-        title: _("Login");
+      child: $Gjs_LoginPage {};
+    }
 
-        child: $Gjs_LoginPage {};
-      }
+    Adw.ViewStackPage {
+      name: "chat";
+      title: _("Chat");
 
-      Adw.ViewStackPage {
-        name: "chat";
-        title: _("Chat");
-
-        child: $Gjs_ChatView {};
-      }
+      child: $Gjs_ChatView {};
     }
   };
 }

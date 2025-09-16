@@ -58,7 +58,7 @@ template $Gjs_ChatView: Adw.Bin {
         child: Adw.ToolbarView {
           [top]
           Adw.HeaderBar {
-            show-title: false;
+            show-title: true;
 
             [title]
             Label userNameLabel {
@@ -70,21 +70,17 @@ template $Gjs_ChatView: Adw.Bin {
             }
           }
 
-          content: Box {
+          content: Box contentBox {
+            vexpand: true;
             orientation: vertical;
 
-            Box contentBox {
+            Box welcomeContainer {
               vexpand: true;
               orientation: vertical;
+            }
 
-              Box welcomeContainer {
-                vexpand: true;
-                orientation: vertical;
-              }
-
-              $Gjs_ChatContent chatContent {
-                vexpand: true;
-              }
+            $Gjs_ChatContent chatContent {
+              vexpand: true;
             }
           };
         };

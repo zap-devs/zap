@@ -1,8 +1,9 @@
 import Adw from "gi://Adw?version=1";
 import GObject from "gi://GObject?version=2.0";
-import Gtk from "gi://Gtk?version=4.0";
+import type Gtk from "gi://Gtk?version=4.0";
 import { logger } from "../../../core/logger.js";
 import type { Message } from "../../../shared/models/chat.model.js";
+import { MessageBubble } from "../components/message-bubble/message-bubble.js";
 
 export class ChatContent extends Adw.Bin {
     protected declare _messageContainer: Gtk.Box;
@@ -136,55 +137,12 @@ export class ChatContent extends Adw.Bin {
     }
 
     private createMessageWidget(message: Message): Gtk.Widget {
-        logger.debug(`Creating message widget for: ${message.text}`);
+        logger.debug(`Creating message bubble for: ${message.text.substring(0, 30)}...`);
 
-        // Create a box for the message
-        const messageBox = new Gtk.Box({
-            orientation: Gtk.Orientation.HORIZONTAL,
-            spacing: 6,
-            margin_start: 6,
-            margin_end: 6,
-            margin_top: 3,
-            margin_bottom: 3,
-        });
+        // Create reusable MessageBubble component
+        const messageBubble = new MessageBubble();
+        messageBubble.setMessageData(message);
 
-        // Align based on whether it's own message or not
-        if (message.isOwn) {
-            messageBox.halign = Gtk.Align.END;
-        } else {
-            messageBox.halign = Gtk.Align.START;
-        }
-
-        // Create the message bubble
-        const bubble = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            spacing: 4,
-            css_classes: message.isOwn ? ["message-bubble", "own-message"] : ["message-bubble"],
-        });
-
-        // Create the message text
-        const messageLabel = new Gtk.Label({
-            label: message.text,
-            wrap: true,
-            halign: Gtk.Align.START,
-        });
-
-        // Create the timestamp
-        const timeLabel = new Gtk.Label({
-            label: message.timestamp,
-            css_classes: ["caption", "dim-label"],
-            halign: Gtk.Align.END,
-        });
-
-        // Assemble the message bubble
-        bubble.append(messageLabel);
-        bubble.append(timeLabel);
-
-        // Add the bubble to the message box
-        messageBox.append(bubble);
-
-        logger.debug(`Message widget created successfully`);
-
-        return messageBox;
+        return messageBubble;
     }
 }

@@ -9,6 +9,8 @@
   border-radius: 18px;
   margin: 4px 0;
   min-width: 50px;
+  max-width: 70%;
+  transition: all 0.2s ease-in-out;
 }
 
 .message-bubble.own-message {
@@ -16,7 +18,7 @@
   color: var(--accent-fg-color);
 }
 
-.message-bubble:not(.own-message) {
+.message-bubble.other-message {
   background-color: var(--sidebar-bg-color);
   color: var(--view-fg-color);
 }
@@ -37,5 +39,15 @@
 
 .chat-timestamp {
   font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.message-timestamp {
+  font-size: 0.75em;
+  opacity: 0.7;
+  margin: 0;
+}
+
+.message-status {
   opacity: 0.7;
 }

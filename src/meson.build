@@ -31,6 +31,7 @@ blueprint_files = files(
   'features/chat/chat-welcome/chat-welcome.blp',
   'features/chat/chat-content/chat-content.blp',
   'features/chat/chat-list-item/chat-list-item.blp',
+  'features/chat/components/message-bubble/message-bubble.blp',
   'resources/help-overlay.blp',
 )
 

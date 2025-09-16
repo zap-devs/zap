@@ -13,6 +13,7 @@
     <file>features/chat/chat-welcome/chat-welcome.js</file>
     <file>features/chat/chat-content/chat-content.js</file>
     <file>features/chat/chat-list-item/chat-list-item.js</file>
+    <file>features/chat/components/message-bubble/message-bubble.js</file>
 
     <!-- Shared files -->
     <file>shared/models/chat.model.js</file>
@@ -29,6 +30,7 @@
     <file>features/chat/chat-welcome/chat-welcome.ui</file>
     <file>features/chat/chat-content/chat-content.ui</file>
     <file>features/chat/chat-list-item/chat-list-item.ui</file>
+    <file>features/chat/components/message-bubble/message-bubble.ui</file>
     <file>resources/help-overlay.ui</file>
   </gresource>
   <gresource prefix="/sh/alisson/Zap/css">

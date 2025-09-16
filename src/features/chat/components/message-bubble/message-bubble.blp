@@ -1,0 +1,57 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $Gjs_MessageBubble: Adw.Bin {
+  child: Box bubbleContainer {
+    orientation: vertical;
+    spacing: 4;
+    margin-start: 6;
+    margin-end: 6;
+    margin-top: 3;
+    margin-bottom: 3;
+
+    styles [
+      "message-bubble",
+    ]
+
+    // Message text content
+    Label messageText {
+      label: "";
+      wrap: true;
+      halign: start;
+      selectable: true;
+      xalign: 0;
+
+      styles [
+        "message-text",
+      ]
+    }
+
+    // Message metadata row (timestamp + status)
+    Box metadataRow {
+      orientation: horizontal;
+      spacing: 6;
+      halign: end;
+      // Timestamp
+      Label timestampLabel {
+        label: "";
+
+        styles [
+          "caption",
+          "dim-label",
+          "message-timestamp",
+        ]
+      }
+
+      // Status icon (only shown for own messages)
+      Image statusIcon {
+        visible: false;
+        pixel-size: 12;
+
+        styles [
+          "message-status",
+        ]
+      }
+    }
+  };
+}

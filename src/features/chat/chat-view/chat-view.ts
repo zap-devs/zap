@@ -36,19 +36,6 @@ export class ChatView extends Adw.Bin {
         );
     }
 
-    public vfunc_constructed(): void {
-        super.vfunc_constructed();
-
-        logger.info("ChatView vfunc_constructed called");
-
-        try {
-            // Don't load data here - do it in realize when template children are available
-            logger.info("ChatView constructed successfully");
-        } catch (error) {
-            logger.error("Error during ChatView construction:", error);
-        }
-    }
-
     public vfunc_realize(): void {
         super.vfunc_realize();
 

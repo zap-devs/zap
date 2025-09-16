@@ -22,11 +22,6 @@ export class ChatListItem extends Adw.ActionRow {
         );
     }
 
-    public vfunc_constructed(): void {
-        super.vfunc_constructed();
-        logger.debug("[ChatListItem] vfunc_constructed called");
-    }
-
     /**
      * Set the chat data for this list item
      */

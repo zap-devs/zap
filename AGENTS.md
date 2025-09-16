@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Zap is a WhatsApp client for GNOME, built as a GTK 4/libadwaita desktop application written in TypeScript. It provides a native WhatsApp messaging experience on the GNOME desktop using GJS (GNOME JavaScript) runtime with GObject introspection bindings and Flatpak for distribution.
+Zap is an unofficial WhatsApp client for GNOME, built as a GTK 4/libadwaita desktop application written in TypeScript. It provides a native WhatsApp messaging experience on the GNOME desktop using GJS (GNOME JavaScript) runtime with GObject introspection bindings and Flatpak for distribution.
 
 ## Tech Stack
 
@@ -77,6 +77,8 @@ bun run tsc --strict
 ### GObject Registration Pattern
 ```typescript
 export class MyWidget extends Adw.Bin {
+    protected declare _childWidget: Gtk.Widget; // The name must start with an underscore here
+
     static {
         GObject.registerClass(
             {

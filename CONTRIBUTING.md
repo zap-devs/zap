@@ -1,0 +1,438 @@
+# Contributing to Zap
+
+We welcome contributions to Zap! This document provides guidelines for contributing to the project.
+
+## Getting Started
+
+### Quick Start for Contributors
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run type checking (`bun run tsc --strict --noEmit`)
+5. Commit your changes (`git commit -m 'Add some amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+## Development Setup
+
+### Prerequisites
+
+Before contributing, ensure you have the following dependencies installed:
+
+- Bun (for TypeScript compilation and tooling)
+- Meson build system (>= 0.62.0)
+- Blueprint compiler (`blueprint-compiler`)
+- Flatpak development tools
+- GTK 4 and libadwaita development libraries
+- GJS (>= 1.54.0)
+
+See [BUILDING.md](BUILDING.md) for detailed installation instructions.
+
+### Setting Up Development Environment
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/alissonlauand/zap.git
+cd zap
+```
+
+2. **Install TypeScript dependencies:**
+```bash
+bun install
+```
+
+3. **Configure debug build:**
+```bash
+meson setup builddir --buildtype=debug
+```
+
+4. **Compile TypeScript and Blueprint files:**
+```bash
+meson compile -C builddir
+```
+
+5. **Run the application in development mode:**
+```bash
+meson devenv -C builddir ninja devel
+```
+
+## Code Style and Conventions
+
+### Git Commit Messages
+
+This project follows the [Conventional Commits specification](https://www.conventionalcommits.org/). Commit messages should be structured as:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+**Types:**
+- `feat`: A new feature
+- `fix`: A bug fix
+- `docs`: Documentation only changes
+- `style`: Changes that do not affect the meaning of the code
+- `refactor`: A code change that neither fixes a bug nor adds a feature
+- `perf`: A code change that improves performance
+- `test`: Adding missing tests or correcting existing tests
+- `build`: Changes that affect the build system or external dependencies
+- `ci`: Changes to CI configuration files and scripts
+- `chore`: Other changes that don't modify src or test files
+
+**Examples:**
+```bash
+feat: add phone number validation to login form
+fix: resolve blueprint template loading issue
+docs: update README with new build instructions
+style: format TypeScript files with biome
+refactor: simplify chat service message handling
+```
+
+### TypeScript
+
+- Use strict TypeScript configuration with explicit types
+- Import both type and runtime versions of GTK modules
+- Prefer explicit typing over `any`
+- Use `void` for functions that don't return values
+
+### GTK/Blueprint
+
+- Use libadwaita widgets (Adw.*) over plain GTK when available
+- Follow GNOME HIG (Human Interface Guidelines)
+- Use symbolic icon names (e.g., `"open-menu-symbolic"`)
+- Keep UI definitions separate in .blp files
+- Use CSS classes for styling, avoid inline styles
+
+### File Organization
+
+- **Core** (`src/core/`) - Core application components (window, logger)
+- **Features** (`src/features/`) - Feature-specific modules organized by domain:
+  - `auth/` - Authentication features (login, welcome)
+  - `chat/` - Chat features (chat-view, chat-welcome)
+- **Shared** (`src/shared/`) - Shared utilities, models, and services
+- **Resources** (`src/resources/`) - Resource files (styles, gresource.xml, help-overlay)
+- **Types** (`src/types/`) - TypeScript type definitions
+- **Infrastructure** (`src/infrastructure/`) - Infrastructure components (logging)
+- Blueprint UI definitions (`.blp`) alongside TypeScript files in feature directories
+- CSS styles in `src/resources/styles/` with libadwaita variables
+
+## Testing
+
+### TypeScript Type Checking
+
+```bash
+# Run strict type checking
+bun run tsc --strict --noEmit
+```
+
+### Application Testing
+
+```bash
+# Run in development mode with hot reload
+meson devenv -C builddir ninja devel
+
+# Test Flatpak build locally
+flatpak run sh.alisson.Zap
+```
+
+## Debugging
+
+### GTK Debugging
+
+```bash
+# Enable GTK debug output
+GTK_DEBUG=all meson devenv -C builddir ninja devel
+
+# Debug specific GTK modules
+GTK_DEBUG=actions,widgets meson devenv -C builddir ninja devel
+```
+
+### GJS Debugging
+
+```bash
+# Run with GJS debugger
+gjs -d ./builddir/src/sh.alisson.Zap
+```
+
+### Common Debug Issues
+
+- **Missing icons**: Check gresource.xml includes all icon files
+- **Template not loading**: Verify resource path matches gresource.xml
+- **Actions not working**: Check action prefixes (app. vs win.)
+- **CSS not applied**: Ensure CSS provider is loaded after display is available
+- **Widget not found**: Check InternalChildren array matches Blueprint IDs exactly
+- **TypeScript errors**: Verify all template children use `!` and proper typing
+- **Blueprint compilation fails**: Check semicolon usage and property syntax
+
+## Critical GTK/libadwaita Patterns
+
+### GObject Registration Pattern
+
+```typescript
+export class MyWidget extends Adw.Bin {
+    protected declare _childWidget: Gtk.Widget; // The name must start with an underscore here
+
+    static {
+        GObject.registerClass(
+            {
+                Template: "resource:///sh/alisson/Zap/ui/my-widget.ui",
+                InternalChildren: ["childWidget"], // Must match Blueprint template
+            },
+            MyWidget,
+        );
+    }
+}
+```
+
+### Action System Pattern
+
+```typescript
+// Application-level actions (prefixed with "app.")
+const quitAction = new Gio.SimpleAction({ name: "quit" });
+this.add_action(quitAction);
+this.set_accels_for_action("app.quit", ["<Control>q"]);
+
+// Window-level actions (prefixed with "win.")
+const myAction = new Gio.SimpleAction({ name: "my-action" });
+this.add_action(myAction);
+```
+
+### Menu Integration Pattern
+
+```typescript
+// In Blueprint (.blp) file:
+menu primary_menu {
+  section {
+    item {
+      label: _("_Settings");
+      action: "win.settings"; // References window action
+    }
+  }
+}
+
+// In TypeScript:
+const settingsAction = new Gio.SimpleAction({ name: "settings" });
+this.add_action(settingsAction);
+```
+
+## Critical GTK/libadwaita Mistakes to Avoid
+
+### 1. Missing GObject Registration
+
+```typescript
+// WRONG: No static registration block
+export class MyWidget extends Adw.Bin {}
+
+// CORRECT: Must register with GObject system
+export class MyWidget extends Adw.Bin {
+    static {
+        GObject.registerClass(MyWidget);
+    }
+}
+```
+
+### 2. Incorrect Template Child Declaration
+
+```typescript
+// WRONG: Missing ! or wrong name
+private childWidget: Gtk.Widget; // TypeScript will complain
+
+// CORRECT: Use ! to tell TypeScript it exists, match Blueprint name
+private childWidget!: Gtk.Widget;
+```
+
+### 3. Wrong Action Prefix
+
+```typescript
+// WRONG: Mixing app and win prefixes
+this.add_action(appAction);
+this.set_accels_for_action("win.app-action", ["<Control>a"]);
+
+// CORRECT: Match the widget level
+// For Application class: use "app." prefix
+// For Window/ApplicationWindow: use "win." prefix
+```
+
+### 4. Missing Virtual Function Override Syntax
+
+```typescript
+// WRONG: Regular method name
+public constructed(): void {}
+
+// CORRECT: vfunc_ prefix for virtual functions
+public vfunc_constructed(): void {}
+```
+
+### 5. Incorrect Resource Paths
+
+```typescript
+// WRONG: Wrong resource path format
+Template: "ui/my-widget.ui"
+
+// CORRECT: Full resource path matching gresource.xml
+Template: "resource:///sh/alisson/Zap/ui/my-widget.ui"
+```
+
+### 6. Missing Type Imports
+
+```typescript
+// WRONG: Missing type imports
+import Gtk from "gi://Gtk?version=4.0";
+
+// CORRECT: Import specific types for better TypeScript support
+import type Gtk from "gi://Gtk?version=4.0";
+import Gtk from "gi://Gtk?version=4.0";
+```
+
+### 7. CSS Variables and Color Usage
+
+```typescript
+// PREFERRED: Use CSS variables instead of old GTK named colors
+// Old GTK syntax: @accent_bg_color, @view_bg_color, etc.
+// New CSS variables syntax: var(--accent-bg-color), var(--view-bg-color), etc.
+
+// CORRECT: Use CSS variables for colors
+.message-bubble {
+  background-color: var(--accent-bg-color);
+  color: var(--accent-fg-color);
+}
+
+// WRONG: Don't use old GTK named color syntax
+.message-bubble {
+  background-color: @accent_bg_color;  // Old syntax, deprecated
+  color: @accent_fg_color;             // Old syntax, deprecated
+}
+
+// NOTE: Some CSS linting errors are false-positives and should be ignored
+// since GTK's CSS implementation is not exactly the same as web CSS.
+// Only fix CSS errors that actually break the GTK styling.
+```
+
+## Common Development Workflow
+
+### Adding a New Feature
+
+1. Create feature directory under `src/features/` (e.g., `src/features/my-feature/`)
+2. Create Blueprint file (`my-feature.blp`) and TypeScript controller (`my-feature.ts`)
+3. Add files to appropriate sections in `src/meson.build`
+4. Add UI resource path to `src/sh.alisson.Zap.src.gresource.xml`
+5. Register widget in main application startup (`src/main.ts`)
+6. Add navigation and window actions in `src/core/window/window.ts`
+
+### Adding a New Page
+
+1. Create Blueprint file in appropriate feature directory (`src/features/[feature]/new-page.blp`)
+2. Create TypeScript controller (`src/features/[feature]/new-page.ts`)
+3. Add to `src/meson.build` sources list in appropriate section
+4. Add to `src/sh.alisson.Zap.src.gresource.xml`
+5. Register in window's ViewStack in `src/core/window/window.ts`
+6. Add navigation action in window class
+
+### Adding a New Widget
+
+1. Create Blueprint template file in appropriate directory (`my-widget.blp`)
+2. Create TypeScript class (`my-widget.ts`) with GObject registration
+3. Add template children to `InternalChildren` array
+4. Access children declaring a protected `this._children` field, which is set by GJS automatically
+5. Add CSS classes and styling as needed
+6. Register widget in main application startup (`src/main.ts`)
+7. Import widget in files where it's used
+
+### Working with Translations
+
+1. Mark translatable strings with `_()` in TypeScript files
+2. Mark translatable strings with `_()` in Blueprint files
+3. Update `po/POTFILES.in` to include new files
+4. Run `meson compile -C builddir` to update translation files
+5. Test with different locales using `LANGUAGE=pt_BR meson devenv -C builddir ninja devel`
+
+### Adding a New Action
+
+1. Create GSimpleAction in appropriate class:
+   - Application-level actions in `src/main.ts` (prefixed with "app.")
+   - Window-level actions in `src/core/window/window.ts` (prefixed with "win.")
+2. Connect to "activate" signal
+3. Add to action map with `add_action()`
+4. Set keyboard shortcuts with `set_accels_for_action()`
+5. Reference in Blueprint menus or other UI elements if needed
+
+### Styling Components
+
+1. Add CSS classes in Blueprint files using `styles` array
+2. Define styles in `src/resources/styles/global.css` using CSS variables
+3. Use semantic color variables (var(--accent-bg-color), var(--view-bg-color), etc.)
+4. Test with both light and dark themes
+5. Follow libadwaita CSS variable naming conventions
+
+## Resource Management
+
+### GResource Structure
+
+```
+/sh/alisson/Zap/
+├── js/          # Compiled JavaScript files
+├── ui/          # Compiled Blueprint (.ui) files
+├── css/         # CSS stylesheets
+└── icons/       # Application icons
+```
+
+### Adding New Resources
+
+1. Add file to appropriate section in `src/sh.alisson.Zap.src.gresource.xml`
+2. Reference with full resource path in code
+3. Ensure Blueprint compiler processes .blp files to .ui
+
+## Security Considerations
+
+- Validate all user input before processing (especially phone numbers)
+- Use secure communication protocols for network requests
+- Follow Flatpak sandboxing best practices
+- Keep GJS and GTK dependencies updated
+- Be cautious with URI launching and external links
+- Use `Gio.UriLauncher` for opening external URLs safely
+
+### Secure URI Handling
+
+```typescript
+// CORRECT: Use Gio.UriLauncher for external URLs
+const launcher = new Gtk.UriLauncher({ uri: "https://example.com" });
+launcher.launch(this, null).catch(console.error);
+
+// WRONG: Don't use direct system calls or unvalidated URLs
+// exec(`xdg-open ${userInput}`) // Security risk!
+```
+
+## Performance Tips
+
+- Use `vexpand: true` and `hexpand: true` for proper layout
+- Avoid excessive widget creation in loops
+- Use CSS classes instead of inline styling
+- Consider using ListBox with custom rows for large datasets
+- Use Adw.Avatar for user avatars (efficient and consistent)
+
+## Pull Request Process
+
+1. Ensure your code follows the project's coding standards
+2. Update documentation as needed
+3. Add tests if applicable
+4. Ensure all tests pass
+5. Update the README if you change the project structure
+6. Your pull request should be focused on a single feature or fix
+7. Include a clear description of what you've changed and why
+
+## Reporting Issues
+
+When reporting bugs or requesting features, please:
+
+1. Use the GitHub issue tracker
+2. Provide a clear and descriptive title
+3. Include steps to reproduce the bug
+4. Include your system information (OS, GTK version, etc.)
+5. For bugs, include any relevant error messages or logs
+6. For features, explain the use case and proposed solution
+
+Thank you for contributing to Zap!

@@ -37,21 +37,17 @@ template $Gjs_ChatView: Adw.Bin {
             ]
           }
 
-          content: Box {
-            orientation: vertical;
+          content: ScrolledWindow {
+            vexpand: true;
+            hscrollbar-policy: never;
 
-            ScrolledWindow {
-              vexpand: true;
-              hscrollbar-policy: never;
+            child: ListBox listBox {
+              selection-mode: single;
 
-              child: ListBox listBox {
-                selection-mode: single;
-
-                styles [
-                  "boxed-list",
-                ]
-              };
-            }
+              styles [
+                "navigation-sidebar",
+              ]
+            };
           };
         };
       };

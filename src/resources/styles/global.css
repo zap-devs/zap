@@ -3,25 +3,6 @@
  * Uses libadwaita's CSS variables for consistent styling
  */
 
-/* Chat message styling */
-.chat-message {
-  padding: 6px 12px;
-  border-radius: 6px;
-  margin: 4px 0;
-}
-
-.chat-message.sent {
-  background-color: var(--accent-bg-color);
-  color: var(--accent-fg-color);
-  margin-left: 20px;
-}
-
-.chat-message.received {
-  background-color: var(--view-bg-color);
-  color: var(--view-fg-color);
-  margin-right: 20px;
-}
-
 /* Message bubble styling */
 .message-bubble {
   padding: 8px 12px;
@@ -36,25 +17,13 @@
 }
 
 .message-bubble:not(.own-message) {
-  background-color: var(--view-bg-color);
+  background-color: var(--sidebar-bg-color);
   color: var(--view-fg-color);
-}
-
-.chat-message.sent {
-  background-color: var(--chat-sent-bg-color-light);
 }
 
 /* Chat list item styling */
 .chat-row {
-  padding: 8px 12px;
-}
-
-.chat-avatar {
-  margin-right: 12px;
-}
-
-.chat-meta-box {
-  margin-left: 12px;
+  padding: 4px 0px;
 }
 
 .unread-badge {

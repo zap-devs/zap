@@ -4,13 +4,14 @@ import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
 import GObject from "gi://GObject?version=2.0";
 import Gtk from "gi://Gtk?version=4.0";
-import { LogLevel, logger } from "./core/logger.js";
-import { Window } from "./core/window/window.js";
-import { LoginPage } from "./features/auth/login/login.js";
-import { WelcomePage } from "./features/auth/welcome/welcome.js";
-import { ChatContent } from "./features/chat/chat-content/chat-content.js";
-import { ChatListItem } from "./features/chat/chat-list-item/chat-list-item.js";
-import { ChatView } from "./features/chat/chat-view/chat-view.js";
+
+import { LogLevel, logger } from "~/core/logger.js";
+import { Window } from "~/core/window/window.js";
+import { LoginPage } from "~/features/auth/login/login.js";
+import { WelcomePage } from "~/features/auth/welcome/welcome.js";
+import { ChatContent } from "~/features/chat/chat-content/chat-content.js";
+import { ChatListItem } from "~/features/chat/chat-list-item/chat-list-item.js";
+import { ChatView } from "~/features/chat/chat-view/chat-view.js";
 
 /**
  * This class is the foundation of most complex applications.

@@ -2,11 +2,12 @@ import Adw from "gi://Adw?version=1";
 import GObject from "gi://GObject?version=2.0";
 import type Gtk from "gi://Gtk?version=4.0";
 import type GtkTypes from "gi://Gtk?version=4.0";
-import { logger } from "../../../core/logger.js";
-import type { Chat, Message } from "../../../shared/models/chat.model.js";
-import type { ChatContent } from "../chat-content/chat-content.js";
-import { ChatListItem } from "../chat-list-item/chat-list-item.js";
-import { ChatWelcome } from "../chat-welcome/chat-welcome.js";
+
+import { logger } from "~/core/logger.js";
+import type { ChatContent } from "~/features/chat/chat-content/chat-content.js";
+import { ChatListItem } from "~/features/chat/chat-list-item/chat-list-item.js";
+import { ChatWelcome } from "~/features/chat/chat-welcome/chat-welcome.js";
+import type { Chat, Message } from "~/shared/models/chat.model.js";
 
 export class ChatView extends Adw.Bin {
     protected declare _listBox: Gtk.ListBox;

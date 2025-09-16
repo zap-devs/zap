@@ -3,7 +3,7 @@
  * Provides common validation functions for user input and data
  */
 
-import { logger } from "../../core/logger.js";
+import { logger } from "~/core/logger.js";
 
 /**
  * Phone number validation result

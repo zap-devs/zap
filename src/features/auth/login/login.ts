@@ -1,8 +1,9 @@
 import Adw from "gi://Adw?version=1";
 import GObject from "gi://GObject?version=2.0";
 import type Gtk from "gi://Gtk?version=4.0";
-import { logger } from "../../../core/logger.js";
-import { validatePhoneNumber } from "../../../shared/utils/validation.js";
+
+import { logger } from "~/core/logger.js";
+import { validatePhoneNumber } from "~/shared/utils/validation.js";
 
 export class LoginPage extends Adw.Bin {
     protected declare _phoneEntry: Gtk.Entry;

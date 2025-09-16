@@ -3,9 +3,10 @@ import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
 import GObject from "gi://GObject?version=2.0";
 import Gtk from "gi://Gtk?version=4.0";
-import { LoginPage } from "../../features/auth/login/login.js";
-import { userService } from "../../shared/services/user-service.js";
-import { logger } from "../logger.js";
+
+import { logger } from "~/core/logger.js";
+import { LoginPage } from "~/features/auth/login/login.js";
+import { userService } from "~/shared/services/user-service.js";
 
 /**
  * Windows are the top-level widgets in our application.

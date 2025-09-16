@@ -13,7 +13,11 @@
         "module": "ESNext",
         "moduleResolution": "bundler",
         "preserveSymlinks": true,
-        "outDir": "builddir/tsc-out"
+        "outDir": "builddir/tsc-out",
+        "baseUrl": ".",
+        "paths": {
+            "~/*": ["src/*"]
+        }
     },
     "include": ["src/"]
 }

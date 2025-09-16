@@ -3,7 +3,7 @@
  * Provides a clean separation between UI components and data management
  */
 
-import { logger } from "../../core/logger.js";
+import { logger } from "~/core/logger.js";
 import type {
     Chat,
     ChatServiceResponse,
@@ -11,7 +11,7 @@ import type {
     PaginatedChatList,
     PaginatedMessageList,
     User,
-} from "../models/chat.model.js";
+} from "~/shared/models/chat.model.js";
 
 /**
  * Chat Service class that manages chat data and operations

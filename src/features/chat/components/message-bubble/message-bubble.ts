@@ -1,9 +1,10 @@
 import Adw from "gi://Adw?version=1";
 import GObject from "gi://GObject?version=2.0";
 import Gtk from "gi://Gtk?version=4.0";
-import { logger } from "../../../../core/logger.js";
-import type { Message } from "../../../../shared/models/chat.model.js";
-import { MessageStatus } from "../../../../shared/models/chat.model.js";
+
+import { logger } from "~/core/logger.js";
+import type { Message } from "~/shared/models/chat.model.js";
+import { MessageStatus } from "~/shared/models/chat.model.js";
 
 export class MessageBubble extends Adw.Bin {
     protected declare _messageText: Gtk.Label;

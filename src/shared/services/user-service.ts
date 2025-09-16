@@ -3,10 +3,10 @@
  * Provides centralized user-related business logic
  */
 
-import { logger } from "../../core/logger.js";
-import type { ChatServiceResponse, User } from "../models/chat.model.js";
-import { UserStatus } from "../models/chat.model.js";
-import { chatService } from "./chat-service.js";
+import { logger } from "~/core/logger.js";
+import type { ChatServiceResponse, User } from "~/shared/models/chat.model.js";
+import { UserStatus } from "~/shared/models/chat.model.js";
+import { chatService } from "~/shared/services/chat-service.js";
 
 /**
  * User Service class that manages user authentication and profile

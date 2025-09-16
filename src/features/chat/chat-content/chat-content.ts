@@ -1,9 +1,10 @@
 import Adw from "gi://Adw?version=1";
 import GObject from "gi://GObject?version=2.0";
 import type Gtk from "gi://Gtk?version=4.0";
-import { logger } from "../../../core/logger.js";
-import type { Message } from "../../../shared/models/chat.model.js";
-import { MessageBubble } from "../components/message-bubble/message-bubble.js";
+
+import { logger } from "~/core/logger.js";
+import { MessageBubble } from "~/features/chat/components/message-bubble/message-bubble.js";
+import type { Message } from "~/shared/models/chat.model.js";
 
 export class ChatContent extends Adw.Bin {
     protected declare _messageContainer: Gtk.Box;
